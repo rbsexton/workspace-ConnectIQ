@@ -1,5 +1,4 @@
-using Toybox.WatchUi as Ui;
-using Toybox.System as Sys;
+using Toybox.WatchUi;
 
 // Version 1.1.0
 //
@@ -13,7 +12,7 @@ using Toybox.System as Sys;
     // 1001-1300km,  22.5h -  1350min/300,000m = 135/30,000 = 9/2000
 
 
-class RandoCalcACP90View extends Ui.SimpleDataField {
+class RandoCalcACP90View extends WatchUi.SimpleDataField {
    //! Set the label of the data field here.
     function initialize() {
         SimpleDataField.initialize();

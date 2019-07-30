@@ -1,4 +1,4 @@
-These data fields calculate your 'Time in the Bank' or 'Time in Hand' (minutes) while you ride.
+These data fields calculate your 'Time in the Bank' or 'Time in Hand' during your ride.   The time is reported in minutes.
 
 There are two general-purpose versions available:
 
@@ -26,11 +26,13 @@ Time in hand is the control closing time (for a control right where you are) min
 
 The ACP-90 calculator implements the ACP rules with allowances for the extra finish time for 200k and 400k events (10 and 20 extra minutes, respectively).  
 
+For best results, start the timer on your Garmin at the official start time for your ride.
+
 Warning!  This calculator will give you misleading numbers on PBP!
 
 ## Adjusting for non-standard distances
 
-The calculator is based upon distance and time, and it doesn't know about your route.  
+The calculator uses distance and time.  It does not use routing information.  
 
 When riding an event that is longer than a standard distance, you must make adjustments.  Example: on a 230k event, you must ride an additional 30km within the 13.5h time limit.   Per the rules, thats 2 hours of riding time (30km / 15km/h ).  You must finish the ride with 2 hours in hand, as displayed by the app.
 
@@ -38,7 +40,7 @@ This calculator doesn't implement the special rules for controls in the first 60
 
 ## Late and early starts
 
-If you start your ride before or after the official ride time you must factor that in when using the calculator.  Example: If you start 5 minutes late you must finish with at least 5 minutes in the bank.
+If you start your ride before or after the official ride time you must factor that in when using the calculator.  Example: If you start 5 minutes late you must finish with at least 5 minutes in the bank.   For events like PBP where your brevet card times may be earlier than your official departure time, start the garmin at your offical start time.
 
 ## Missed Turns
 

@@ -49,6 +49,8 @@ This calculator will misleadingly give you time credit for distance ridden off-r
 # How it works
 The Calculator uses a table of controls.   For each control, the calculator knows how many minutes are allowed to arrive at the control, and required minimum speeds from that control onwards.   The rest is math.
 
+The tables in the apps are based upon google spreadsheets that you can see
+here: <a href=https://docs.google.com/spreadsheets/d/14ysFNrUc_20SzWS6OVvjkP4j7RbKd-nPyg7SgSiM4ww/edit?usp=sharing">PBP 2019 Control Close times</a>
 
 # No Warranties
 

@@ -18,7 +18,6 @@ using Toybox.System;
 class RandoCalcPBP84hView extends WatchUi.SimpleDataField {
 
 	// Distance Offset, Minutes Offset, Minutes/meter for this leg.
-	// For a 200k, you get an extra 10m
 	const lut = [
 		[       0,    0, 0.003626728 ],
 		[  217000,  787, 0.003752809 ],
@@ -51,14 +50,7 @@ class RandoCalcPBP84hView extends WatchUi.SimpleDataField {
         table_entry = 0;
     }
 
-     
-    // Take two - do 
-    // distance (m)  * (60min/15000m) = distance/250   ( 15kph )
-    // Table from RUSA (90-hour ACP), simplified for closing only. 
-    // RUSA Says 601-1000 = 13.kph.
-    // 11430m = 3600s.  s/m = 3600/11430 
-    // 15000m = 3600s   s/m = 3600/15000
-   function compute(info) {
+    function compute(info) {
    		if ( info.elapsedDistance == null ||
    		     info.elapsedTime == null ) {
    			return(0);
@@ -72,8 +64,8 @@ class RandoCalcPBP84hView extends WatchUi.SimpleDataField {
    		// Simplify this to a check for the next one.
    		var i = table_entry + 1;
    		
-   		// If the next entry is less than the distance so far
-   		// and the next entry isn't zero, use that one.
+   		// If the next entry distance is less than the distance so far
+   		// and the next entry isn't zero, use the next one.
    		if ( lut[i][0] != 0 && info.elapsedDistance > lut[i][0] ) {
    			 table_entry = i; // Save state!
    			 }
@@ -86,6 +78,8 @@ class RandoCalcPBP84hView extends WatchUi.SimpleDataField {
    		var leg_minutes_allowed = leg_ridden * lut[i][2];
    		
    		closetime_mins = base_mins + leg_minutes_allowed; 	
+   		
+   		// ---------------------------------------------------
    		 
    		// System.print("i"); System.print(i); 
    		// System.print(" d"); System.print(info.elapsedDistance); 
@@ -96,19 +90,10 @@ class RandoCalcPBP84hView extends WatchUi.SimpleDataField {
     	// System.print(" kph:"); System.print(speed); 
 
     	// System.print(" c"); System.print(closetime_mins); 
+
+    	// System.print(" b"); System.print(closetime_mins - elapsed_mins); 
     	// System.println(" ");
     	 		 	
-   		// Sys.println(ideal);
-   		// itemcount = itemcount + 1;
-   		// printcount = printcount + 1;
-   		// if ( printcount >= 10 ) {
-   		//	printcount = printcount - 10;
-   		//	Sys.print(itemcount); Sys.print(" ");
-   		//	Sys.print(elapsed_mins); Sys.print(" ");
-   		//	Sys.print(closetime_mins); Sys.print(" ");
-   		//	Sys.println(info.elapsedDistance/1000);
-		//	}			
-
    		return(closetime_mins - elapsed_mins);
     }
    // --------------------------------------------------------------

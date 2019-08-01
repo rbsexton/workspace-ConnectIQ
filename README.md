@@ -28,7 +28,8 @@ The ACP-90 calculator implements the ACP rules with allowances for the extra fin
 
 For best results, start the timer on your Garmin at the official start time for your ride.
 
-Warning!  This calculator will give you misleading numbers on PBP!
+Warning!  This calculator will give you misleading numbers on PBP!  Please use a PBP Specific
+calculator for PBP.
 
 ## Adjusting for non-standard distances
 

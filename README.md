@@ -5,7 +5,7 @@ There are two general-purpose versions available:
 - ACP 90 Hour rules.   This calculator calculates control close times based upon the ACP 90 hour rules, as interpreted by RUSA.   It's applicable to all brevets sanctioned by RUSA.  
 - Uniform 90-Hour time, as used by SIR
 
-There are three Calculators available for 2019 PBP:
+There are three Calculators available for 2019 Paris-Brest-Paris:
 
 - PBP 80 Hour Rules for 2019.     
 - PBP 84 Hour Rules for 2019.     

@@ -24,8 +24,11 @@ class RandoCalcV2View extends WatchUi.DataField {
     hidden var PreviousBanked;
     hidden var trend;
     hidden var trend_downcounter;  
-    
+        
 	hidden var table_entry;
+	
+	hidden var banked_fake;
+	
 	
     // Set the label of the data field here.
     function initialize() {
@@ -35,7 +38,31 @@ class RandoCalcV2View extends WatchUi.DataField {
         table_entry = 0;
         trend = " ";
         trend_downcounter = 4;
+        banked_fake = 0.75f;
 	    }
+
+
+	// Generate a monotonic counter that triggers the different 
+	// display formats.
+	function simulate() {
+	
+		if ( banked_fake > 1.25 && banked_fake < 1.5 ) { // Seconds to minutes.
+			banked_fake = 89.75; 
+			}
+		else if ( banked_fake > 90.25 &&  banked_fake < 91.0 ) { // 90 minutes to hours.
+			banked_fake = 119.5;
+			}
+		else if ( banked_fake > 120.5 && banked_fake < 121.0  ) { // hours to tens of hours.
+			banked_fake = 599.75;
+			}
+			
+
+		banked_fake = banked_fake + 0.016103; // Prime-ish
+	
+		}
+		
+
+
 
     function compute(info) {
     
@@ -86,6 +113,10 @@ class RandoCalcV2View extends WatchUi.DataField {
    		closetime_mins = base_mins + leg_minutes_allowed; 	
    		 
    		BankedTime = (closetime_mins - elapsed_mins);
+   		
+   		simulate();
+   		BankedTime  = banked_fake;
+   		
    		return; 
     }
    // --------------------------------------------------------------
@@ -151,31 +182,64 @@ class RandoCalcV2View extends WatchUi.DataField {
     		}
     
     
-    	// Now we format it according to magnitude
-    	if ( banked < 1.0 ) { // Minutes
+    	// Now we format it according to magnitude.
+    	// There are about 6 digits to work with.
+    	
+    	// ---------------- Seconds ----------------
+    	// XXs 
+    	System.println(banked);
+    	
+    	if ( banked < 1.0 ) { // Seconds
     		var seconds = banked * 60.0f;
     		seconds = seconds.toNumber(); // Round to an integer.
     		formatted = seconds.format("%d") + "s";
     		}
-    	else if ( banked < 60.0 ) {
-			// Calculate minutes and seconds.    	
+    	// ---------------- Up to 90 Minutes ----------------
+    	// XXmSS
+    	else if ( banked < 90.0 ) { // Minutes and seconds.
     		var m = banked.toNumber();
     		var s = ( banked - m ) * 60.0f;
     		s = s.toNumber();
     		
     		formatted = m.format("%d") + "m" + s.format("%02d");  	
     		}
+    
+		// For long durations, we pull out hours, minutes and seconds.
     	else {
-    		// Convert this into hours.
-    		var x = banked * ( 0.0166666666666666666666666f ); // divide by 60 
-    		var h = x.toNumber();
-    		var m = (x - h) * 60.0f ; // back to minutes. 
-    		m = m.toNumber();
+    	    var b_hours = banked * ( 0.0166666666666666666666666f ); // divide by 60
     		
-    		formatted = h.format("%d") + "h" + m.format("%02d") + trend;  		
-    	} 
-    	
-    	
+    		var h = b_hours.toNumber();
+    		var m = banked - (h * 60.0f); // back to minutes with fractional minutes.
+
+	    	// ---------------- Up to 10 Hours ----------------
+	    	// XhYY:ZZ 
+			if ( banked < 600.0 ) {
+				// Minutes and seconds conversion to integers.
+	    		var s = (m - m.toNumber()) * 60.0f; 
+
+	    		m = m.toNumber();
+	    		s = s.toNumber();
+	    		
+	    		formatted = h.format("%d") + "h" +  m.format("%02d") + ":" + s.format("%02d");  				
+	    		// formatted = h.format("%d") + "h" +  m.format("%02.2f");  				
+				}
+	    	// ---------------- Over 10 Hours ----------------
+	    	// XXhMM.M 
+			else {			
+			System.println("m +" + m);
+				// It looks like the garmin formatter isn't as flexible as I would like.
+				// Look for short minutes and add the leading zero as a character.
+				if ( m < 10.0f ) {
+		    		formatted = h.format("%d") + "h0" + m.format("%0.1f");  				
+					}
+				else {
+					formatted = h.format("%d") + "h" + m.format("%0.1f");  				
+					}
+					
+				}
+
+    		}
+    	    	
     	if ( inthehole ) {
     		if ( getBackgroundColor() == Graphics.COLOR_BLACK ) {
     			View.findDrawableById("Background").setColor(Graphics.COLOR_WHITE);

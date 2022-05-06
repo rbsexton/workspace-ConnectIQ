@@ -2,4 +2,10 @@
     <string id="AppName">RandoCalcV2</string>
 
     <string id="label">My Value</string>
+    <string id="methodTitle">Method used to calculate time in hand</string>
+    <string id="ACP90">ACP90</string>
+    <string id="PBP90">PBP90</string>
+    <string id="PBP84">PBP84</string>
+    <string id="PBP80">PBP80</string>
+    <string id="straight90">straight 90</string>
 </strings>

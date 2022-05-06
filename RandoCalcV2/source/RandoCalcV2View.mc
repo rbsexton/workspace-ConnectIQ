@@ -164,24 +164,28 @@ class RandoCalcV2View extends WatchUi.DataField {
    		var elapsed_mins;
    		elapsed_mins = (info.elapsedTime * .0000166666 );
    		
-   		// First, we need to figure out which entry.
-   		// Simplify this to a check for the next one.
-   		var i = table_entry + 1;
-   		
-   		// If the next entry is less than the distance so far
-   		// and the next entry isn't zero, use that one.
-   		if ( lut[i][0] != 0 && info.elapsedDistance > lut[i][0] ) {
-   			 table_entry = i; // Save state!
-   			 }
-   		else { i = table_entry; }
-   		
-   		
-   		// Now we've ID'd the table entry to use.
-   		var base_mins  = lut[i][1];
-   		var leg_ridden = info.elapsedDistance - lut[i][0];
-   		var leg_minutes_allowed = leg_ridden * lut[i][2];
-   		
-   		closetime_mins = base_mins + leg_minutes_allowed; 	
+   		if (which_flavor != 4/*straight*/) {
+	   		// First, we need to figure out which entry.
+	   		// Simplify this to a check for the next one.
+	   		var i = table_entry + 1;
+	   		
+	   		// If the next entry is less than the distance so far
+	   		// and the next entry isn't zero, use that one.
+	   		if ( lut[i][0] != 0 && info.elapsedDistance > lut[i][0] ) {
+	   			 table_entry = i; // Save state!
+	   			 }
+	   		else { i = table_entry; }
+	   		
+	   		
+	   		// Now we've ID'd the table entry to use.
+	   		var base_mins  = lut[i][1];
+	   		var leg_ridden = info.elapsedDistance - lut[i][0];
+	   		var leg_minutes_allowed = leg_ridden * lut[i][2];
+	   		
+	   		closetime_mins = base_mins + leg_minutes_allowed;
+   		} else {
+   			closetime_mins = info.elapsedDistance * .0045 ;
+   		} 	
    		 
    		BankedTime = (closetime_mins - elapsed_mins);
    		

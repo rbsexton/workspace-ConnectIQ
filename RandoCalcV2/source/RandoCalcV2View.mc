@@ -13,7 +13,7 @@ class RandoCalcV2View extends WatchUi.DataField {
 	// Note:   This table looks a little funny because there is bonus
 	// time built in due to rounding.  For a 200k and 400k, you get 
 	// additional time ( 10m and 20m, respectively )
-	
+
 	const acp_90_lut = [
 		[       0,    0, 0.004050000 ],
 		[  200000,  810, 0.003900000 ],
@@ -40,7 +40,7 @@ class RandoCalcV2View extends WatchUi.DataField {
 		[ 1097000, 4788, 0.005038961 ],		
 		[ 1174000, 5176, 0.004977778 ],		
 		[ 1219000, 5400, 0.004977778 ],		
-		[ 0, 0, 0 ] // Mark the end of the list.
+		[ 0, 0, 0 ]
 		];
 		
 	const pbp_84_lut = [
@@ -59,7 +59,7 @@ class RandoCalcV2View extends WatchUi.DataField {
 		[ 1097000, 4429, 0.005025974],		
 		[ 1174000, 4816, 0.004977778 ],		
 		[ 1219000, 5040, 0.004977778 ],		
-		[ 0, 0, 0 ] // Mark the end of the list.
+		[ 0, 0, 0 ] 
 		];
 		
 	const pbp_80_lut = [
@@ -78,17 +78,31 @@ class RandoCalcV2View extends WatchUi.DataField {
 		[ 1097000, 4236, 0.004649351 ],		
 		[ 1174000, 4594, 0.004577778 ],		
 		[ 1219000, 4800, 0.004577778 ],		
-		[ 0, 0, 0 ] // Mark the end of the list.
+		[ 0, 0, 0 ] 
 		];
 
 	const straight_90_lut = [ // (90*60) / 1200000 
 		[       0,    0, 0.004500000 ],
-		[ 0, 0, 0 ] // Mark the end of the list.
+		[ 0, 0, 0 ] 
 		];
 
+	// Table from https://rusa.org/octime_perm.html
+	//    0-699 15kph 
+	//  700-1299 13.3 kph
+	// 1300-1890 12kph 
+	// 1900-2499 10kph 
+	// 2500+     200km/day 
+	const rusa_lut = [
+		[       0,     0, 0.00400000000000  ], 
+		[  700000,  2800, 0.004511278195489 ], //  46:40
+		[ 1300000,  5865, 0.000500000000000 ], //  97:45
+		[ 1900000,  9500, 0.000600000000000 ], // 158:20		
+		[ 2500000, 18000, 0.000720000000000 ], // 300:00 	
+		[ 0, 0, 0 ] 
+		];
 
-	const luts         = [acp_90_lut, pbp_90_lut, pbp_84_lut, pbp_80_lut, straight_90_lut];
-	const method_names = ["ACP 90",   "PBP 90",   "PBP 84",   "PBP 80",   "Str-90"       ];
+	const luts         = [acp_90_lut, pbp_90_lut, pbp_84_lut, pbp_80_lut, straight_90_lut , rusa_lut ];
+	const method_names = ["ACP 90",   "PBP 90",   "PBP 84",   "PBP 80",   "Str-90"        , "RUSA"   ];
 	
 	// -------------------------------------------------------------------------
 	// Main Logic 

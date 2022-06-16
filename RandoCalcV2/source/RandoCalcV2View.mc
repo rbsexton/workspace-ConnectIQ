@@ -10,7 +10,10 @@ class RandoCalcV2View extends WatchUi.DataField {
 	// -------------------------------------------------------------------------
 
 	// Distance Offset, Minutes Offset, Minutes/meter for this leg.
-	// For a 200k, you get an extra 10m
+	// Note:   This table looks a little funny because there is bonus
+	// time built in due to rounding.  For a 200k and 400k, you get 
+	// additional time ( 10m and 20m, respectively )
+	
 	const acp_90_lut = [
 		[       0,    0, 0.004050000 ],
 		[  200000,  810, 0.003900000 ],
@@ -78,7 +81,7 @@ class RandoCalcV2View extends WatchUi.DataField {
 		[ 0, 0, 0 ] // Mark the end of the list.
 		];
 
-	const straight_90_lut = [ (90*60) / 1200000 = 
+	const straight_90_lut = [ // (90*60) / 1200000 
 		[       0,    0, 0.004500000 ],
 		[ 0, 0, 0 ] // Mark the end of the list.
 		];
@@ -101,11 +104,11 @@ class RandoCalcV2View extends WatchUi.DataField {
 	
 	hidden var banked_fake;
 	
-	var which_flavor;
+	hidden var which_flavor;
+	var        method_name;
 	
-	var lut;
+	var        lut;
 	
-	var method_name;
 	
     // Set the label of the data field here.
     function initialize() {

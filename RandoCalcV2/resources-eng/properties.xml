@@ -1,0 +1,11 @@
+<resources>
+	<properties>
+		<property id="method" type="number">0</property></properties>
+	<settings>
+		<setting propertyKey="@Properties.method" title="@Strings.methodTitle">
+			<settingConfig type="list">
+				<listEntry value="0">@Strings.ACP90</listEntry>
+				<listEntry value="1">@Strings.PBP90</listEntry>
+				<listEntry value="2">@Strings.PBP84</listEntry>
+				<listEntry value="3">@Strings.PBP80</listEntry>
+				<listEntry value="4">@Strings.straight90</listEntry></settingConfig></setting></settings></resources>

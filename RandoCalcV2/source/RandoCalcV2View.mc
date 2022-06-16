@@ -1,12 +1,13 @@
 using Toybox.WatchUi;
 using Toybox.Graphics;
+using Toybox.Application;
 
 class RandoCalcV2View extends WatchUi.DataField {
 
 
 	// Distance Offset, Minutes Offset, Minutes/meter for this leg.
 	// For a 200k, you get an extra 10m
-	const lut = [
+	const acp_90_lut = [
 		[       0,    0, 0.004050000 ],
 		[  200000,  810, 0.003900000 ],
 		[  300000, 1200, 0.004200000 ],
@@ -15,6 +16,68 @@ class RandoCalcV2View extends WatchUi.DataField {
 		[ 1000000, 4500, 0.004511278 ],		
 		[ 0, 0, 0 ] // Mark the end of the list.
 		];
+		
+	const pbp_90_lut = [
+		[       0,    0, 0.004000000 ],
+		[  217000,  868, 0.004000000 ],
+		[  306000, 1224, 0.004277778 ],
+		[  360000, 1455, 0.004282353 ],		
+		[  445000, 1819, 0.004289474 ],		
+		[  521000, 2145, 0.004280899 ],		
+		[  610000, 2526, 0.004313253 ],		
+		[  693000, 2884, 0.004544444 ],		
+		[  783000, 3293, 0.004639535 ],		
+		[  869000, 3692, 0.004611111 ],		
+		[  923000, 3941, 0.004775281 ],		
+		[ 1012000, 4366, 0.004964706 ],		
+		[ 1097000, 4788, 0.005038961 ],		
+		[ 1174000, 5176, 0.004977778 ],		
+		[ 1219000, 5400, 0.004977778 ],		
+		[ 0, 0, 0 ] // Mark the end of the list.
+		];
+		
+	const pbp_84_lut = [
+		[       0,    0, 0.003626728 ],
+		[  217000,  787, 0.003752809 ],
+		[  306000, 1121, 0.003740741 ],
+		[  360000, 1323, 0.003752941 ],		
+		[  445000, 1642, 0.004000000 ],		
+		[  521000, 1946, 0.004000000 ],		
+		[  610000, 2302, 0.004024096 ],		
+		[  693000, 2636, 0.004122222 ],		
+		[  783000, 3007, 0.004313953 ],		
+		[  869000, 3378, 0.004425926 ],		
+		[  923000, 3617, 0.004617978 ],		
+		[ 1012000, 4028, 0.004717647 ],		
+		[ 1097000, 4429, 0.005025974],		
+		[ 1174000, 4816, 0.004977778 ],		
+		[ 1219000, 5040, 0.004977778 ],		
+		[ 0, 0, 0 ] // Mark the end of the list.
+		];
+		
+	const pbp_80_lut = [
+		[       0,    0, 0.003525346 ],
+		[  217000,  765, 0.003539326 ],
+		[  306000, 1080, 0.003518519 ],
+		[  360000, 1270, 0.003752941 ],		
+		[  445000, 1589, 0.003750000 ],		
+		[  521000, 1874, 0.003752809 ],		
+		[  610000, 2208, 0.004024096 ],		
+		[  693000, 2542, 0.003977778 ],		
+		[  783000, 2900, 0.004023256 ],		
+		[  869000, 3246, 0.004222222 ],		
+		[  923000, 3474, 0.004292135 ],		
+		[ 1012000, 3856, 0.004470588 ],		
+		[ 1097000, 4236, 0.004649351 ],		
+		[ 1174000, 4594, 0.004577778 ],		
+		[ 1219000, 4800, 0.004577778 ],		
+		[ 0, 0, 0 ] // Mark the end of the list.
+		];
+		
+	const luts = [acp_90_lut, pbp_90_lut, pbp_84_lut, pbp_80_lut];
+	
+	const method_names = ["ACP 90", "PBP 90", "PBP 84", "PBP 80", "Straight 90"];
+	
    // --------------------------------------------------------------
    // CUT HERE - Master Code from PBP84
    // --------------------------------------------------------------
@@ -29,6 +92,11 @@ class RandoCalcV2View extends WatchUi.DataField {
 	
 	hidden var banked_fake;
 	
+	var which_flavor;
+	
+	var lut;
+	
+	var method_name;
 	
     // Set the label of the data field here.
     function initialize() {
@@ -39,6 +107,9 @@ class RandoCalcV2View extends WatchUi.DataField {
         trend = " ";
         trend_downcounter = 4;
         banked_fake = 0.75f;
+        which_flavor = Application.Properties.getValue("method");
+        lut = luts[which_flavor];
+        method_name = method_names[which_flavor];     
 	    }
 
 
@@ -93,24 +164,28 @@ class RandoCalcV2View extends WatchUi.DataField {
    		var elapsed_mins;
    		elapsed_mins = (info.elapsedTime * .0000166666 );
    		
-   		// First, we need to figure out which entry.
-   		// Simplify this to a check for the next one.
-   		var i = table_entry + 1;
-   		
-   		// If the next entry is less than the distance so far
-   		// and the next entry isn't zero, use that one.
-   		if ( lut[i][0] != 0 && info.elapsedDistance > lut[i][0] ) {
-   			 table_entry = i; // Save state!
-   			 }
-   		else { i = table_entry; }
-   		
-   		
-   		// Now we've ID'd the table entry to use.
-   		var base_mins  = lut[i][1];
-   		var leg_ridden = info.elapsedDistance - lut[i][0];
-   		var leg_minutes_allowed = leg_ridden * lut[i][2];
-   		
-   		closetime_mins = base_mins + leg_minutes_allowed; 	
+   		if (which_flavor != 4/*straight*/) {
+	   		// First, we need to figure out which entry.
+	   		// Simplify this to a check for the next one.
+	   		var i = table_entry + 1;
+	   		
+	   		// If the next entry is less than the distance so far
+	   		// and the next entry isn't zero, use that one.
+	   		if ( lut[i][0] != 0 && info.elapsedDistance > lut[i][0] ) {
+	   			 table_entry = i; // Save state!
+	   			 }
+	   		else { i = table_entry; }
+	   		
+	   		
+	   		// Now we've ID'd the table entry to use.
+	   		var base_mins  = lut[i][1];
+	   		var leg_ridden = info.elapsedDistance - lut[i][0];
+	   		var leg_minutes_allowed = leg_ridden * lut[i][2];
+	   		
+	   		closetime_mins = base_mins + leg_minutes_allowed;
+   		} else {
+   			closetime_mins = info.elapsedDistance * .0045 ;
+   		} 	
    		 
    		BankedTime = (closetime_mins - elapsed_mins);
    		
@@ -254,7 +329,7 @@ class RandoCalcV2View extends WatchUi.DataField {
  				View.findDrawableById("value").setColor(Graphics.COLOR_WHITE); 			
     			}
 
-			View.findDrawableById("label").setText("Late");
+			View.findDrawableById("label").setText("Late " + method_name);
     		}
  		else { 
  			if ( getBackgroundColor() == Graphics.COLOR_BLACK ) {
@@ -270,7 +345,7 @@ class RandoCalcV2View extends WatchUi.DataField {
  				View.findDrawableById("value").setColor(Graphics.COLOR_BLACK);
  				}
  				
-			View.findDrawableById("label").setText("Banked");
+			View.findDrawableById("label").setText("Banked " + method_name);
  			}   
     
     	

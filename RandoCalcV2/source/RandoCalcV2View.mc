@@ -5,6 +5,10 @@ using Toybox.Application;
 class RandoCalcV2View extends WatchUi.DataField {
 
 
+	// -------------------------------------------------------------------------
+	// Look up tables.
+	// -------------------------------------------------------------------------
+
 	// Distance Offset, Minutes Offset, Minutes/meter for this leg.
 	// For a 200k, you get an extra 10m
 	const acp_90_lut = [
@@ -78,9 +82,9 @@ class RandoCalcV2View extends WatchUi.DataField {
 	
 	const method_names = ["ACP 90", "PBP 90", "PBP 84", "PBP 80", "Straight 90"];
 	
-   // --------------------------------------------------------------
-   // CUT HERE - Master Code from PBP84
-   // --------------------------------------------------------------
+	// -------------------------------------------------------------------------
+	// Main Logic 
+	// -------------------------------------------------------------------------
 
     hidden var BankedTime; // Final calulated value.
     hidden var mValueLast; //
@@ -101,17 +105,18 @@ class RandoCalcV2View extends WatchUi.DataField {
     // Set the label of the data field here.
     function initialize() {
         DataField.initialize();
-        BankedTime = 0.0f;
-        PreviousBanked = 0.0f;
-        table_entry = 0;
-        trend = " ";
+        BankedTime        = 0.0f;
+        PreviousBanked    = 0.0f;
+        table_entry       = 0;
+        trend             = " ";
         trend_downcounter = 4;
-        banked_fake = 0.75f;
-        which_flavor = Application.Properties.getValue("method");
-        lut = luts[which_flavor];
-        method_name = method_names[which_flavor];     
-	    }
 
+        banked_fake       = 0.75f;
+
+        which_flavor      = Application.Properties.getValue("method");
+        lut               = luts[which_flavor];
+        method_name       = method_names[which_flavor];     
+	    }
 
 	// Generate a monotonic counter that triggers the different 
 	// display formats.
@@ -126,15 +131,10 @@ class RandoCalcV2View extends WatchUi.DataField {
 		else if ( banked_fake > 120.5 && banked_fake < 121.0  ) { // hours to tens of hours.
 			banked_fake = 599.75;
 			}
-			
-
-		banked_fake = banked_fake + 0.016103; // Prime-ish
 	
+		banked_fake = banked_fake + 0.016103; // Prime-ish
 		}
 		
-
-
-
     function compute(info) {
     
    		if ( info.elapsedDistance == null || info.elapsedTime == null ) {
@@ -142,6 +142,7 @@ class RandoCalcV2View extends WatchUi.DataField {
    			return;
    			}
   
+		// The Mario Claussnitzer feature.
   		// Calculate the trend every 5s.
   		if ( trend_downcounter == 0 ) {
   			trend_downcounter = 4;

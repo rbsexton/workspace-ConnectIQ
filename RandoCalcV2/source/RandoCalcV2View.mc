@@ -77,10 +77,15 @@ class RandoCalcV2View extends WatchUi.DataField {
 		[ 1219000, 4800, 0.004577778 ],		
 		[ 0, 0, 0 ] // Mark the end of the list.
 		];
-		
-	const luts = [acp_90_lut, pbp_90_lut, pbp_84_lut, pbp_80_lut];
-	
-	const method_names = ["ACP 90", "PBP 90", "PBP 84", "PBP 80", "Straight 90"];
+
+	const straight_90_lut = [ (90*60) / 1200000 = 
+		[       0,    0, 0.004500000 ],
+		[ 0, 0, 0 ] // Mark the end of the list.
+		];
+
+
+	const luts         = [acp_90_lut, pbp_90_lut, pbp_84_lut, pbp_80_lut, straight_90_lut];
+	const method_names = ["ACP 90",   "PBP 90",   "PBP 84",   "PBP 80",   "Str-90"       ];
 	
 	// -------------------------------------------------------------------------
 	// Main Logic 
@@ -160,34 +165,28 @@ class RandoCalcV2View extends WatchUi.DataField {
   			trend_downcounter = trend_downcounter - 1;
   			}
   
-  
    		var closetime_mins;
    		var elapsed_mins;
    		elapsed_mins = (info.elapsedTime * .0000166666 );
    		
-   		if (which_flavor != 4/*straight*/) {
-	   		// First, we need to figure out which entry.
-	   		// Simplify this to a check for the next one.
-	   		var i = table_entry + 1;
-	   		
-	   		// If the next entry is less than the distance so far
-	   		// and the next entry isn't zero, use that one.
-	   		if ( lut[i][0] != 0 && info.elapsedDistance > lut[i][0] ) {
-	   			 table_entry = i; // Save state!
-	   			 }
-	   		else { i = table_entry; }
-	   		
-	   		
-	   		// Now we've ID'd the table entry to use.
-	   		var base_mins  = lut[i][1];
-	   		var leg_ridden = info.elapsedDistance - lut[i][0];
-	   		var leg_minutes_allowed = leg_ridden * lut[i][2];
-	   		
-	   		closetime_mins = base_mins + leg_minutes_allowed;
-   		} else {
-   			closetime_mins = info.elapsedDistance * .0045 ;
-   		} 	
-   		 
+		// Figure out which entry.
+		// Simplify this to a check for the next one.
+		var i = table_entry + 1;
+		
+		// If the next entry is less than the distance so far
+		// and the next entry isn't zero, use that one.
+		if ( lut[i][0] != 0 && info.elapsedDistance > lut[i][0] ) {
+				table_entry = i; // Save state!
+				}
+		else { i = table_entry; }
+		
+		// Now we've ID'd the table entry to use.
+		var base_mins  = lut[i][1];
+		var leg_ridden = info.elapsedDistance - lut[i][0];
+		var leg_minutes_allowed = leg_ridden * lut[i][2];
+		
+		closetime_mins = base_mins + leg_minutes_allowed;
+		
    		BankedTime = (closetime_mins - elapsed_mins);
    		
    		simulate();
@@ -310,10 +309,8 @@ class RandoCalcV2View extends WatchUi.DataField {
 					}
 				else {
 					formatted = h.format("%d") + "h" + m.format("%0.1f");  				
-					}
-					
+					}	
 				}
-
     		}
     	    	
     	if ( inthehole ) {

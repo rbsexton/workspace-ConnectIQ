@@ -82,7 +82,7 @@ class RandoCalcV2View extends WatchUi.DataField {
 		];
 
 	const straight_90_lut = [ // (90*60) / 1200000 
-		[       0,    0, 0.004500000 ],
+		[ 0, 0, 0.004500000 ],
 		[ 0, 0, 0 ] 
 		];
 
@@ -101,8 +101,11 @@ class RandoCalcV2View extends WatchUi.DataField {
 		[ 0, 0, 0 ] 
 		];
 
+	// These lists will be indexed by the user config settings.
 	const luts         = [acp_90_lut, pbp_90_lut, pbp_84_lut, pbp_80_lut, straight_90_lut , rusa_lut ];
-	const method_names = ["ACP 90",   "PBP 90",   "PBP 84",   "PBP 80",   "Str-90"        , "RUSA"   ];
+
+	// Displayable table names.
+	const method_names = ["ACP90",    "PBP90",    "PBP84",    "PBP80",    "RM90"        , "RUSA"   ];
 	
 	// -------------------------------------------------------------------------
 	// Main Logic 

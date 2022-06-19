@@ -4,6 +4,7 @@ using Toybox.Application;
 
 class RandoCalcV2View extends WatchUi.DataField {
 
+	const do_simulate = 1;
 
 	// -------------------------------------------------------------------------
 	// Look up tables.
@@ -119,13 +120,13 @@ class RandoCalcV2View extends WatchUi.DataField {
         
 	hidden var table_entry;
 	
-	hidden var banked_fake;
+	hidden var simulated_distance;
+	hidden var simulation_counter;
 	
 	hidden var which_flavor;
 	var        method_name;
 	
 	var        lut;
-	
 	
     // Set the label of the data field here.
     function initialize() {
@@ -136,33 +137,71 @@ class RandoCalcV2View extends WatchUi.DataField {
         trend             = " ";
         trend_downcounter = 4;
 
-        banked_fake       = 0.75f;
-
         which_flavor      = Application.Properties.getValue("method");
         lut               = luts[which_flavor];
         method_name       = method_names[which_flavor];     
+
+		simulated_distance = 0.0;
+		simulation_counter  = 0;
+
+		System.println("Started");
 	    }
 
 	// Generate a monotonic counter that triggers the different 
-	// display formats.
+	// display formats.   Do this with simulated distance. 
+	// 30 kph = 30000 m / 3600 s = 8.333 m/s
+
+	// General Plan:
+	// Start, 0 kph for 30s
+	// 30 kph for 30s 
+
 	function simulate() {
 	
-		if ( banked_fake > 1.25 && banked_fake < 1.5 ) { // Seconds to minutes.
-			banked_fake = 89.75; 
-			}
-		else if ( banked_fake > 90.25 &&  banked_fake < 91.0 ) { // 90 minutes to hours.
-			banked_fake = 119.5;
-			}
-		else if ( banked_fake > 120.5 && banked_fake < 121.0  ) { // hours to tens of hours.
-			banked_fake = 599.75;
-			}
-	
-		banked_fake = banked_fake + 0.016103; // Prime-ish
+		if ( do_simulate != 1 ) { return; } 
+
+		simulation_counter = simulation_counter + 1;
+		System.println("Sim  " + simulation_counter + " " +  simulated_distance);
+
+		if ( simulation_counter > 1000 ) {
+			simulated_distance = simulated_distance + 8.3333;
+			return;
 		}
+
+		if ( simulation_counter == 120 ) { // Bump to just under 10h surplus
+			simulated_distance = simulated_distance + 8.4 * 15000;
+		}
+
+		if ( simulation_counter == 90 ) { // Bump to just under 90m surplus
+			simulated_distance = simulated_distance + 1.46 * 15000;
+		}
+
+		if ( simulation_counter  > 90 ) {
+			simulated_distance = simulated_distance + 8.3333;
+			return;
+		}
+
+		if ( simulation_counter > 60 ) {
+			simulated_distance = simulated_distance + 4.17;
+			return;
+		}
+
+		if ( simulation_counter > 30 ) {
+			simulated_distance = simulated_distance + 8.3333;
+			return;
+		}
+	}
 		
     function compute(info) {
-    
-   		if ( info.elapsedDistance == null || info.elapsedTime == null ) {
+
+		var distance;
+		if ( do_simulate ) {
+			simulate();
+			distance = simulated_distance;	
+		} else {
+			distance = info.elapsedDistance;	
+		}
+
+   		if ( distance == null || info.elapsedTime == null ) {
    			BankedTime = 0.0f;
    			return;
    			}
@@ -195,30 +234,27 @@ class RandoCalcV2View extends WatchUi.DataField {
 		
 		// If the next entry is less than the distance so far
 		// and the next entry isn't zero, use that one.
-		if ( lut[i][0] != 0 && info.elapsedDistance > lut[i][0] ) {
+		if ( lut[i][0] != 0 && distance > lut[i][0] ) {
 				table_entry = i; // Save state!
 				}
 		else { i = table_entry; }
 		
 		// Now we've ID'd the table entry to use.
 		var base_mins  = lut[i][1];
-		var leg_ridden = info.elapsedDistance - lut[i][0];
+		var leg_ridden = distance - lut[i][0];
 		var leg_minutes_allowed = leg_ridden * lut[i][2];
 		
 		closetime_mins = base_mins + leg_minutes_allowed;
 		
    		BankedTime = (closetime_mins - elapsed_mins);
-   		
-   		simulate();
-   		BankedTime  = banked_fake;
-   		
+   			
    		return; 
     }
-   // --------------------------------------------------------------
-   // CUT HERE   
-   // --------------------------------------------------------------
-   		
  
+	// --------------------------------------------------------------
+	// Layout  
+	// --------------------------------------------------------------
+			
     // Set your layout here. Anytime the size of obscurity of
     // the draw context is changed this will be called.
     function onLayout(dc) {
@@ -282,7 +318,7 @@ class RandoCalcV2View extends WatchUi.DataField {
     	
     	// ---------------- Seconds ----------------
     	// XXs 
-    	System.println(banked);
+    	// System.println(banked);
     	
     	if ( banked < 1.0 ) { // Seconds
     		var seconds = banked * 60.0f;
@@ -321,15 +357,8 @@ class RandoCalcV2View extends WatchUi.DataField {
 	    	// ---------------- Over 10 Hours ----------------
 	    	// XXhMM.M 
 			else {			
-			System.println("m +" + m);
-				// It looks like the garmin formatter isn't as flexible as I would like.
-				// Look for short minutes and add the leading zero as a character.
-				if ( m < 10.0f ) {
-		    		formatted = h.format("%d") + "h0" + m.format("%0.1f");  				
-					}
-				else {
-					formatted = h.format("%d") + "h" + m.format("%0.1f");  				
-					}	
+			    // System.println("m +" + m);
+		    	formatted = h.format("%d") + "h" + m.format("%02d");  				
 				}
     		}
     	    	

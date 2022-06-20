@@ -115,8 +115,6 @@ class RandoCalcV2View extends WatchUi.DataField {
     hidden var BankedTime; // Final calulated value.
     hidden var mValueLast; //
     hidden var PreviousBanked;
-    hidden var trend;
-    hidden var trend_downcounter;  
         
 	hidden var table_entry;
 	
@@ -128,14 +126,22 @@ class RandoCalcV2View extends WatchUi.DataField {
 	
 	var        lut;
 	
+	var        trend_data = new[31];
+	hidden var trend_i;
+   	hidden var trend;
+
     // Set the label of the data field here.
     function initialize() {
         DataField.initialize();
         BankedTime        = 0.0f;
         PreviousBanked    = 0.0f;
         table_entry       = 0;
-        trend             = " ";
-        trend_downcounter = 4;
+
+		for( var i = 0; i < trend_data.size(); i++ ) {
+			trend_data[i] = 0.0; 
+		}
+
+        trend_i           = 0;
 
         which_flavor      = Application.Properties.getValue("method");
         lut               = luts[which_flavor];
@@ -205,25 +211,7 @@ class RandoCalcV2View extends WatchUi.DataField {
    			BankedTime = 0.0f;
    			return;
    			}
-  
-		// The Mario Claussnitzer feature.
-  		// Calculate the trend every 5s.
-  		if ( trend_downcounter == 0 ) {
-  			trend_downcounter = 4;
-  			
-  			if ( BankedTime > PreviousBanked ) {
-  				trend = "+";
-  				}
-  			else { 
-  				trend = "-";
-  				}
-  			
-  			PreviousBanked = BankedTime;
-  			}
-  		else { 
-  			trend_downcounter = trend_downcounter - 1;
-  			}
-  
+    
    		var closetime_mins;
    		var elapsed_mins;
    		elapsed_mins = (info.elapsedTime * .0000166666 );
@@ -247,7 +235,31 @@ class RandoCalcV2View extends WatchUi.DataField {
 		closetime_mins = base_mins + leg_minutes_allowed;
 		
    		BankedTime = (closetime_mins - elapsed_mins);
-   			
+   	
+		// ---------------------------------------------------------------
+		// Trend Calculation. 
+
+		// The Mario Claussnitzer feature.
+  		// Calculate the trend based upon the last 30s.   Every sample, 
+		// pull the oldest data point in the array, then replace it with the 
+		// newest and advance the index.
+		// You are making progress if you are gaining more than 1s/s
+		{
+			var trend_benchmark = trend_data[trend_i] + 0.5;
+
+  			if ( BankedTime > trend_benchmark ) {
+  				trend = "+";
+  				}
+  			else { 
+  				trend = " ";
+  				}
+
+			trend_data[trend_i] = BankedTime;
+
+			if ( trend_i < 30 ) { trend_i++; }
+			else { trend_i = 0; }
+		}
+
    		return; 
     }
  
@@ -361,7 +373,10 @@ class RandoCalcV2View extends WatchUi.DataField {
 		    	formatted = h.format("%d") + "h" + m.format("%02d");  				
 				}
     		}
-    	    	
+
+		// Add the trend indicator.
+		formatted = formatted + trend;
+		    	    	
     	if ( inthehole ) {
     		if ( getBackgroundColor() == Graphics.COLOR_BLACK ) {
     			View.findDrawableById("Background").setColor(Graphics.COLOR_WHITE);

@@ -150,7 +150,7 @@ class RandoCalcV2View extends WatchUi.DataField {
 		simulated_distance = 0.0;
 		simulation_counter  = 0;
 
-		System.println("Started");
+		System.println("Started 0kph");
 	    }
 
 	// Generate a monotonic counter that triggers the different 
@@ -165,38 +165,41 @@ class RandoCalcV2View extends WatchUi.DataField {
 	
 		if ( do_simulate != 1 ) { return; } 
 
-		simulation_counter = simulation_counter + 1;
-		System.println("Sim  " + simulation_counter + " " +  simulated_distance);
+		simulation_counter++;
+		System.print(".");
 
-		if ( simulation_counter > 1000 ) {
+		if ( simulation_counter == 240 ) { // Bump to just under 10h surplus
+			System.println("Distance = 150km");
+			simulated_distance = simulated_distance + 8.38 * 15000;
+		}
+
+		if ( simulation_counter == 180 ) { // Bump to just under 90m surplus
+			System.println("Distance = 22.5km");
+			simulated_distance = simulated_distance + 1.445 * 15000;
+		}
+
+		if ( simulation_counter == 130 ) { System.println("Sim 30kph"); } 
+
+		if ( simulation_counter  > 130 ) {
 			simulated_distance = simulated_distance + 8.3333;
 			return;
 		}
 
-		if ( simulation_counter == 120 ) { // Bump to just under 10h surplus
-			simulated_distance = simulated_distance + 8.4 * 15000;
-		}
+		if ( simulation_counter == 90 ) { System.println("Sim 15kph"); } 
 
-		if ( simulation_counter == 90 ) { // Bump to just under 90m surplus
-			simulated_distance = simulated_distance + 1.46 * 15000;
-		}
-
-		if ( simulation_counter  > 90 ) {
-			simulated_distance = simulated_distance + 8.3333;
+		if ( simulation_counter > 90 ) {
+			simulated_distance = simulated_distance + 4.15;
 			return;
 		}
 
-		if ( simulation_counter > 60 ) {
-			simulated_distance = simulated_distance + 4.17;
-			return;
-		}
-
+		if ( simulation_counter == 30 ) { System.println("Sim 30kph"); } 
+ 
 		if ( simulation_counter > 30 ) {
 			simulated_distance = simulated_distance + 8.3333;
 			return;
 		}
 	}
-		
+				
     function compute(info) {
 
 		var distance;
@@ -214,7 +217,13 @@ class RandoCalcV2View extends WatchUi.DataField {
     
    		var closetime_mins;
    		var elapsed_mins;
-   		elapsed_mins = (info.elapsedTime * .0000166666 );
+
+		if ( do_simulate != 1 ) { 
+	   		elapsed_mins = (info.elapsedTime * .0000166666 );
+		}	
+		else { 
+	   		elapsed_mins = (info.timerTime * .0000166666 );
+		}
    		
 		// Figure out which entry.
 		// Simplify this to a check for the next one.

@@ -142,6 +142,7 @@ class RandoCalcV2View extends WatchUi.DataField {
 		}
 
         trend_i           = 0;
+   		trend             = "";
 
         which_flavor      = Application.Properties.getValue("method");
         lut               = luts[which_flavor];

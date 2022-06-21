@@ -335,7 +335,8 @@ class RandoCalcV2View extends WatchUi.DataField {
     
     
     	// Now we format it according to magnitude.
-    	// There are about 6 digits to work with.
+    	// Real world tests show that there are at most 4 digits 
+		// to work with.
     	
     	// ---------------- Seconds ----------------
     	// XXs 
@@ -356,7 +357,8 @@ class RandoCalcV2View extends WatchUi.DataField {
     		formatted = m.format("%d") + "m" + s.format("%02d");  	
     		}
     
-		// For long durations, we pull out hours, minutes and seconds.
+    	// ---------------- Up to 90 Minutes ----------------
+		// The Math is the same for HmMM.M and HHmMM, so do it together.
     	else {
     	    var b_hours = banked * ( 0.0166666666666666666666666f ); // divide by 60
     		
@@ -364,22 +366,23 @@ class RandoCalcV2View extends WatchUi.DataField {
     		var m = banked - (h * 60.0f); // back to minutes with fractional minutes.
 
 	    	// ---------------- Up to 10 Hours ----------------
-	    	// XhYY:ZZ 
+	    	// XhYY.Z 
 			if ( banked < 600.0 ) {
 				// Minutes and seconds conversion to integers.
-	    		var s = (m - m.toNumber()) * 60.0f; 
+	    		// var s = (m - m.toNumber()) * 60.0f; 
 
-	    		m = m.toNumber();
-	    		s = s.toNumber();
+	    		// m = m.toNumber();
+	    		// s = s.toNumber();
 	    		
-	    		formatted = h.format("%d") + "h" +  m.format("%02d") + ":" + s.format("%02d");  				
+	    		formatted = h.format("%d") + "h" +  m.format("%02.1f");  				
 	    		// formatted = h.format("%d") + "h" +  m.format("%02.2f");  				
 				}
 	    	// ---------------- Over 10 Hours ----------------
-	    	// XXhMM.M 
+	    	// XXhMM
 			else {			
 			    // System.println("m +" + m);
-		    	formatted = h.format("%d") + "h" + m.format("%02d");  				
+		    	m = m.toNumber();
+				formatted = h.format("%d") + "h" + m.format("%02d");  				
 				}
     		}
 

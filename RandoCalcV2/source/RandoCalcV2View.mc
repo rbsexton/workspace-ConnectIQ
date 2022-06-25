@@ -4,7 +4,7 @@ using Toybox.Application;
 
 class RandoCalcV2View extends WatchUi.DataField {
 
-	const do_simulate = 1;
+	const do_simulate = 0;
 
 	// -------------------------------------------------------------------------
 	// Look up tables.
@@ -126,9 +126,10 @@ class RandoCalcV2View extends WatchUi.DataField {
 	
 	var        lut;
 	
-	var        trend_data = new[31];
+	var        trend_data_banked  = new[31];
+	var        trend_data_elapsed = new[31];
 	hidden var trend_i;
-   	hidden var trend;
+   	hidden var trend_text;
 
     // Set the label of the data field here.
     function initialize() {
@@ -137,12 +138,13 @@ class RandoCalcV2View extends WatchUi.DataField {
         PreviousBanked    = 0.0f;
         table_entry       = 0;
 
-		for( var i = 0; i < trend_data.size(); i++ ) {
-			trend_data[i] = 0.0; 
+		for( var i = 0; i < trend_data_banked.size(); i++ ) {
+			trend_data_banked[i]  = 0.0; 
+			trend_data_elapsed[i] = 0.0;
 		}
 
         trend_i           = 0;
-   		trend             = "";
+   		trend_text        = "";
 
         which_flavor      = Application.Properties.getValue("method");
         lut               = luts[which_flavor];
@@ -250,24 +252,26 @@ class RandoCalcV2View extends WatchUi.DataField {
 		// Trend Calculation. 
 
 		// The Mario Claussnitzer feature.
-  		// Calculate the trend based upon the last 30s.   Every sample, 
-		// pull the oldest data point in the array, then replace it with the 
-		// newest and advance the index.
-		// You are making progress if you are gaining more than 1s/s
+  		// Save the current timestamp and the current banked value. 
+		// Compare the two.  
+	
 		{
-			var trend_benchmark = trend_data[trend_i] + 0.5;
+			// Both banked time and elapsed time are monotonically increasing.
+			var trend_banked  = BankedTime - trend_data_banked[trend_i];
+			var trend_elapsed = elapsed_mins - trend_data_elapsed[trend_i];
 
-  			if ( BankedTime > trend_benchmark ) {
-  				trend = "+";
+  			if ( trend_banked > trend_elapsed ) {
+  				trend_text = "+";
   				}
   			else { 
-  				trend = " ";
+  				trend_text = " ";
   				}
 
-			trend_data[trend_i] = BankedTime;
+			trend_data_banked[trend_i]  = BankedTime;
+			trend_data_elapsed[trend_i] = elapsed_mins; 
 
 			if ( trend_i < 30 ) { trend_i++; }
-			else { trend_i = 0; }
+			else                { trend_i = 0; }
 		}
 
    		return; 
@@ -388,7 +392,7 @@ class RandoCalcV2View extends WatchUi.DataField {
     		}
 
 		// Add the trend indicator.
-		formatted = formatted + trend;
+		formatted = formatted + trend_text;
 		    	    	
     	if ( inthehole ) {
     		if ( getBackgroundColor() == Graphics.COLOR_BLACK ) {

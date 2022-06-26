@@ -1,12 +1,10 @@
 These data fields calculate your 'Time in the Bank' or 'Time in Hand' during your ride.   The time is reported in minutes.
 
-There are two general-purpose versions available:
+This calculator includes tables for the following closing times:
 
 - ACP 90 Hour rules.   This calculator calculates control close times based upon the ACP 90 hour rules, as interpreted by RUSA.   It's applicable to all brevets sanctioned by RUSA.  
 - Uniform 90-Hour time, as used by SIR
-
-There are three Calculators available for 2019 Paris-Brest-Paris:
-
+- RUSA Permanent time.   Similar to 90 hour ACP rules, but without the 'bonus minutes' that riders get on 200k and 400k events.  Supports RUSA rules for very long permanents ( 200k/day )
 - PBP 80 Hour Rules for 2019.     
 - PBP 84 Hour Rules for 2019.     
 - PBP 90 Hour Rules for 2019.     
@@ -15,10 +13,18 @@ The PBP calculators are based upon the timetables published by ACP, and require 
 
 You can find instructions on loading the app on the Garmin Site
 
-# Supported Devices (as of 2019)
-- Edge 520 and later
-- Edge 820 and later
-- Edge 1000 and later
+*Instructions on how to switch are here*
+
+# Supported Devices (as of 2022)
+- All garmin device that support data fields.
+
+# Improvements in 2.1.1 
+
+Display time in hand in seconds, minutes + seconds, or Hours + Minutes 
+
+The display now features a *Trend* indicator that shows when you are putting time in the bank. 
+
+You can choose the rules from 
 
 # How to use the app
 
@@ -28,7 +34,7 @@ The ACP-90 calculator implements the ACP rules with allowances for the extra fin
 
 For best results, start the timer on your Garmin at the official start time for your ride.
 
-Warning!  This calculator will give you misleading numbers on PBP!  Please use a PBP Specific
+*Warning!*  This calculator will give you misleading numbers on PBP!  Please use a PBP Specific
 calculator for PBP.
 
 ## Adjusting for non-standard distances
@@ -48,7 +54,9 @@ If you start your ride before or after the official ride time you must factor th
 This calculator will misleadingly give you time credit for distance ridden off-route.   You can estimate the error using the technique described under non-standard distance. 
 
 # How it works
-The Calculator uses a table of controls.   For each control, the calculator knows how many minutes are allowed to arrive at the control, and required minimum speeds from that control onwards.   The rest is math.
+The Calculator uses a table of controls.   For each control, the calculator knows how many minutes are allowed to arrive at the control, and the required minimum speeds from that control onwards. 
+
+In mathematical terms, control closing time can be described as a piecewise linear graph.   The calculator can calculate the offical closing time for any distance and compare that with your elapsed time.
 
 The tables in the apps are based upon google spreadsheets that you can see
 here: <a href="https://docs.google.com/spreadsheets/d/14ysFNrUc_20SzWS6OVvjkP4j7RbKd-nPyg7SgSiM4ww/edit?usp=sharing">PBP 2019 Control Close times</a>

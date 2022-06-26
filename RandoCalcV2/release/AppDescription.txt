@@ -1,0 +1,22 @@
+These data fields calculate your 'Time in the Bank' or 'Time in Hand' during your ride.   The time is reported in minutes.
+
+This calculator includes tables for the following closing times:
+
+- ACP 90 Hour rules.   This calculator calculates control close times based upon the ACP 90 hour rules, as interpreted by RUSA.   It's applicable to all brevets sanctioned by RUSA.  
+- Uniform 90-Hour time, as used by SIR
+- RUSA Permanent time.   Similar to 90 hour ACP rules, but without the 'bonus minutes' that riders get on 200k and 400k events.  Supports RUSA rules for very long permanents ( 200k/day )
+- PBP 80 Hour Rules for 2019.     
+- PBP 84 Hour Rules for 2019.     
+- PBP 90 Hour Rules for 2019.     
+
+The PBP calculators are based upon the timetables published by ACP, and require no special adjustments.
+
+You can find instructions on loading the app on the Garmin Site.  You can select the desired time rules from the Garmin Connect app on your phone or from Garmin connect on your computer.
+
+Improvements Version in 2.1.1 
+
+Display time in hand in seconds, minutes + seconds, or Hours + Minutes.  Formatted for small data fields.   The data field shows less detail as you get more time in the bank.
+
+The display now features a *Trend* indicator ( a + to the right of your time that shows when you are putting time in the bank. 
+
+More detail about the app and how it works is available at the link for the source code on the app page.

@@ -127,7 +127,6 @@ class RandoCalcV2View extends WatchUi.DataField {
 	var        lut;
 	
 	var        trend_data_banked  = new[31];
-	var        trend_data_elapsed = new[31];
 	hidden var trend_i;
    	hidden var trend_text;
 
@@ -140,7 +139,6 @@ class RandoCalcV2View extends WatchUi.DataField {
 
 		for( var i = 0; i < trend_data_banked.size(); i++ ) {
 			trend_data_banked[i]  = 0.0; 
-			trend_data_elapsed[i] = 0.0;
 		}
 
         trend_i           = 0;
@@ -252,15 +250,19 @@ class RandoCalcV2View extends WatchUi.DataField {
 		// Trend Calculation. 
 
 		// The Mario Claussnitzer feature.
-  		// Save the current timestamp and the current banked value. 
-		// Compare the two.  
+  		// Save the current current banked value. 
+		// If you have more banked time than you did 30s ago, its a positive trend.
 	
-		{
-			// Both banked time and elapsed time are monotonically increasing.
-			var trend_banked  = BankedTime - trend_data_banked[trend_i];
-			var trend_elapsed = elapsed_mins - trend_data_elapsed[trend_i];
+		// trend_i should always point at the oldest data points.
 
-  			if ( trend_banked > trend_elapsed ) {
+		{
+		
+			var trend_banked  = BankedTime   - trend_data_banked[trend_i];
+
+			// System.print  ("tBanked " + trend_banked + " tElapsed " + trend_elapsed );
+			// System.println(" distance " + distance + " speed " + info.currentSpeed * 3.6);
+
+  			if ( trend_banked > 0 ) {
   				trend_text = "+";
   				}
   			else { 
@@ -268,7 +270,6 @@ class RandoCalcV2View extends WatchUi.DataField {
   				}
 
 			trend_data_banked[trend_i]  = BankedTime;
-			trend_data_elapsed[trend_i] = elapsed_mins; 
 
 			if ( trend_i < 30 ) { trend_i++; }
 			else                { trend_i = 0; }

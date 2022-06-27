@@ -1,6 +1,7 @@
 <resources>
 	<properties>
 		<property id="method" type="number">0</property>
+		<property id="ui_verbose" type="number">0</property>
 	</properties>
 
 	<settings>
@@ -13,6 +14,12 @@
 				<listEntry value="4">@Strings.Straight90</listEntry>
 				<listEntry value="5">@Strings.RUSA</listEntry>
 				<listEntry value="6">@Strings.LEL125</listEntry>
+			</settingConfig>
+		</setting>
+		<setting propertyKey="@Properties.ui_verbose" title="@Strings.ui_verboseTitle">
+			<settingConfig type="list">
+				<listEntry value="0">@Strings.ui_verbose_short</listEntry>
+				<listEntry value="1">@Strings.ui_verbose_long</listEntry>
 			</settingConfig>
 		</setting>
 	</settings>

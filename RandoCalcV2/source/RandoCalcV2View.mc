@@ -130,6 +130,9 @@ class RandoCalcV2View extends WatchUi.DataField {
 	hidden var which_flavor;
 	var        method_name;
 	
+	hidden var verbose; 
+	hidden var verbose_cutoff;
+
 	var        lut;
 	
 	var        trend_data_banked  = new[31];
@@ -149,6 +152,10 @@ class RandoCalcV2View extends WatchUi.DataField {
 
         trend_i           = 0;
    		trend_text        = "";
+
+		verbose           = Application.Properties.getValue("ui_verbose");
+		if ( verbose ) { verbose_cutoff = 90.0; }
+		else           { verbose_cutoff = 60.0; } 
 
         which_flavor      = Application.Properties.getValue("method");
         lut               = luts[which_flavor];
@@ -359,9 +366,9 @@ class RandoCalcV2View extends WatchUi.DataField {
     		seconds = seconds.toNumber(); // Round to an integer.
     		formatted = seconds.format("%d") + "s";
     		}
-    	// ---------------- Up to 90 Minutes ----------------
+    	// ---------------- Up to 60 / 90 Minutes ----------------
     	// XXmSS
-    	else if ( banked < 90.0 ) { // Minutes and seconds.
+    	else if ( banked < verbose_cutoff ) { // Minutes and seconds.
     		var m = banked.toNumber();
     		var s = ( banked - m ) * 60.0f;
     		s = s.toNumber();
@@ -369,7 +376,7 @@ class RandoCalcV2View extends WatchUi.DataField {
     		formatted = m.format("%d") + "m" + s.format("%02d");  	
     		}
     
-    	// ---------------- Up to 90 Minutes ----------------
+    	// ---------------- Beyond 60 or 90m ----------------------------
 		// The Math is the same for HmMM.M and HHmMM, so do it together.
     	else {
     	    var b_hours = banked * ( 0.0166666666666666666666666f ); // divide by 60
@@ -379,7 +386,7 @@ class RandoCalcV2View extends WatchUi.DataField {
 
 	    	// ---------------- Up to 10 Hours ----------------
 	    	// XhYY.Z 
-			if ( banked < 600.0 ) {
+			if ( verbose && banked < 600.0 ) {
 				// Minutes and seconds conversion to integers.
 	    		// var s = (m - m.toNumber()) * 60.0f; 
 

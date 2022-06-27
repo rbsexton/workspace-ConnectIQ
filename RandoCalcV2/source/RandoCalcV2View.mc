@@ -102,11 +102,17 @@ class RandoCalcV2View extends WatchUi.DataField {
 		[ 0, 0, 0 ] 
 		];
 
+	// LEL 125h Rules.   Straight time, 1520km in 125h
+	const lel125_lut = [
+		[ 0, 0, 0.004934210526316 ], 
+		[ 0, 0, 0 ] 
+		];
+
 	// These lists will be indexed by the user config settings.
-	const luts         = [acp_90_lut, pbp_90_lut, pbp_84_lut, pbp_80_lut, straight_90_lut , rusa_lut ];
+	const luts = [acp_90_lut, pbp_90_lut, pbp_84_lut, pbp_80_lut, straight_90_lut , rusa_lut, lel125_lut ];
 
 	// Displayable table names.
-	const method_names = ["ACP90",    "PBP90",    "PBP84",    "PBP80",    "RM90"        , "RUSA"   ];
+	const method_names = ["ACP90", "PBP90", "PBP84", "PBP80", "RM90" , "RUSA", "LEL125" ];
 	
 	// -------------------------------------------------------------------------
 	// Main Logic 

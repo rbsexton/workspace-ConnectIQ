@@ -12,6 +12,7 @@
 				<listEntry value="3">@Strings.PBP80</listEntry>
 				<listEntry value="4">@Strings.Straight90</listEntry>
 				<listEntry value="5">@Strings.RUSA</listEntry>
+				<listEntry value="6">@Strings.LEL125</listEntry>
 			</settingConfig>
 		</setting>
 	</settings>

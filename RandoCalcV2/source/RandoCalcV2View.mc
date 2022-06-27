@@ -260,20 +260,13 @@ class RandoCalcV2View extends WatchUi.DataField {
    		BankedTime = (closetime_mins - elapsed_mins);
    	
 		// ---------------------------------------------------------------
-		// Trend Calculation. 
-
-		// The Mario Claussnitzer feature.
+		// Trend Calculation for Mario Claussnitzer.
   		// Save the current current banked value. 
 		// If you have more banked time than you did 30s ago, its a positive trend.
-	
-		// trend_i should always point at the oldest data points.
-
 		{
-		
 			var trend_banked  = BankedTime   - trend_data_banked[trend_i];
 
-			// System.print  ("tBanked " + trend_banked + " tElapsed " + trend_elapsed );
-			// System.println(" distance " + distance + " speed " + info.currentSpeed * 3.6);
+			// System.print  ("tBanked " + trend_banked + ");
 
   			if ( trend_banked > 0 ) {
   				trend_text = "+";
@@ -352,14 +345,14 @@ class RandoCalcV2View extends WatchUi.DataField {
     		formatted = "";
     		}
     
-    
-    	// Now we format it according to magnitude.
-    	// Real world tests show that there are at most 4 digits 
-		// to work with.
+    	// System.println(banked);
+
+    	// Format it according to magnitude.
+    	// Real world tests show that there are at most 4 usable digits  
+		// on a 530, with 10 fields on the screen.
     	
     	// ---------------- Seconds ----------------
     	// XXs 
-    	// System.println(banked);
     	
     	if ( banked < 1.0 ) { // Seconds
     		var seconds = banked * 60.0f;
@@ -387,15 +380,9 @@ class RandoCalcV2View extends WatchUi.DataField {
 	    	// ---------------- Up to 10 Hours ----------------
 	    	// XhYY.Z 
 			if ( verbose && banked < 600.0 ) {
-				// Minutes and seconds conversion to integers.
-	    		// var s = (m - m.toNumber()) * 60.0f; 
-
-	    		// m = m.toNumber();
-	    		// s = s.toNumber();
-	    		
 	    		formatted = h.format("%d") + "h" +  m.format("%02.1f");  				
-	    		// formatted = h.format("%d") + "h" +  m.format("%02.2f");  				
 				}
+
 	    	// ---------------- Over 10 Hours ----------------
 	    	// XXhMM
 			else {			
@@ -441,18 +428,6 @@ class RandoCalcV2View extends WatchUi.DataField {
 			View.findDrawableById("label").setText("Banked " + method_name);
  			}   
     
-    	
-        // Set the background color
-        //View.findDrawableById("Background").setColor(getBackgroundColor());
-
-        // Set the foreground color and value
-        //var value = View.findDrawableById("value");
-        //if (getBackgroundColor() == Graphics.COLOR_BLACK) {
-         //   value.setColor(Graphics.COLOR_WHITE);
-        //} else {
-        //    value.setColor(Graphics.COLOR_BLACK);
-        //}
-
         View.findDrawableById("value").setText(formatted);
 
         // Call parent's onUpdate(dc) to redraw the layout

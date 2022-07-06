@@ -12,8 +12,8 @@ class RandoCalcV2View extends WatchUi.DataField {
 
 	// Distance Offset, Minutes Offset, Minutes/meter for this leg.
 	// Note:   This table looks a little funny because there is bonus
-	// time built in due to rounding.  For a 200k and 400k, you get 
-	// additional time ( 10m and 20m, respectively )
+	// time built in due to rounding up the time limits per ACP. 
+	// For a 200k and 400k, you get additional time ( 10m and 20m, respectively )
 
 	const acp_90_lut = [
 		[       0,    0, 0.004050000 ],

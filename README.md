@@ -7,9 +7,10 @@ This calculator includes tables for the following closing times:
 - RUSA Permanent time.   Similar to 90 hour ACP rules, but without the 'bonus minutes' that riders get on 200k and 400k events.  Supports RUSA rules for very long permanents ( 200k/day )
 - PBP 80 Hour Rules for 2019.     
 - PBP 84 Hour Rules for 2019.     
-- PBP 90 Hour Rules for 2019.     
+- PBP 90 Hour Rules for 2019.
+- LEL 125 Hour Rules, 2022: 1540km.
 
-The PBP calculators are based upon the timetables published by ACP, and require no special adjustments.
+The PBP calculators are based upon the timetables published by ACP.
 
 You can find instructions on loading the app on the Garmin Site
 

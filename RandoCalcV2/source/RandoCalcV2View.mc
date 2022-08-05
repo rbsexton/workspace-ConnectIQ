@@ -106,7 +106,8 @@ class RandoCalcV2View extends WatchUi.DataField {
 	// LEL 2022 Final, with route changes 2022-07-31.   1520km in 125h 
 	const lel125_lut = [
 		// [ 0, 0, 0.004934210526316 ], // 1520km in 125h
-		   [ 0, 0, 0.00487012987013  ], // 1540km in 125h 
+		// [ 0, 0, 0.00487012987013  ], // 1540km in 125h 
+		   [ 0, 0, 0.00500000000000  ], // 1540km in 128.333h = 12kph
 		   [ 0, 0, 0 ] 
 		];
 

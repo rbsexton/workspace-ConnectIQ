@@ -115,7 +115,7 @@ class RandoCalcV2View extends WatchUi.DataField {
 	const luts = [acp_90_lut, pbp_90_lut, pbp_84_lut, pbp_80_lut, straight_90_lut , rusa_lut, lel125_lut ];
 
 	// Displayable table names.
-	const method_names = ["ACP90", "PBP90", "PBP84", "PBP80", "RM90" , "RUSA", "LEL125" ];
+	const method_names = ["ACP90", "PBP90", "PBP84", "PBP80", "RM90" , "RUSA", "LEL128" ];
 	
 	// -------------------------------------------------------------------------
 	// Main Logic 

@@ -4,16 +4,18 @@ using Toybox.Application;
 
 class RandoCalcV2View extends WatchUi.DataField {
 
-	const do_simulate = 1;
+	const do_simulate = 0;
 
 	// -------------------------------------------------------------------------
 	// Look up tables.
 	// -------------------------------------------------------------------------
 
-	// Distance (km), Hours Offset, Minutes/meter for this leg.
+	// Distance (km), Hours Offset, kph for this leg.
 	//
-	// These units seem a bit strange, but they map onto the native
-	// units of the GPS, which are seconds and meters.    Seconds are 
+	// The internal units are meters, minutes, and minutes/meter.
+	// the first step is converting from human friendly units to something 
+	// that works better for calculation. 
+
 	// a bit unwieldy when the natural unit for the end user is 
 	// minutes, so the first step is conversion to minutes. 
 	// This is an embedded device, so its better to do any complex math 
@@ -22,11 +24,6 @@ class RandoCalcV2View extends WatchUi.DataField {
 	// Note:   This table looks a little funny because there is bonus
 	// time built in due to rounding up the time limits per ACP. 
 	// For a 200k and 400k, you get additional time ( 10m and 20m, respectively )
-
-	// Min   Hour     1000 m   1000 Hour 
-	// --- * -----  * ------ = -------
-    // m     60 Min   km         60 km 
-	// m/min = 60/1000 kph 
 
 	// Update, Aug 2022 
 	const acp_90_lut = [
@@ -252,7 +249,6 @@ class RandoCalcV2View extends WatchUi.DataField {
 		
 		// Otherwise no movement.   
 
-
 	}
 				
     function compute(info) {
@@ -278,6 +274,8 @@ class RandoCalcV2View extends WatchUi.DataField {
 		}	
 		else { 
 	   		elapsed_mins = (info.timerTime * .0000166666 );
+
+			// System.println( "dist: " + distance + " mins: " + elapsed_mins);
 		}
    		
 		// Figure out which entry.

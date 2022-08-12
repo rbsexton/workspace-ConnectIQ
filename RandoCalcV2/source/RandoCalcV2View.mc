@@ -11,6 +11,14 @@ class RandoCalcV2View extends WatchUi.DataField {
 	// -------------------------------------------------------------------------
 
 	// Distance Offset, Minutes Offset, Minutes/meter for this leg.
+	//
+	// These units seem a bit strange, but they map onto the native
+	// units of the GPS, which are seconds and meters.    Seconds are 
+	// a bit unwieldy when the natural unit for the end user is 
+	// minutes, so the first step is conversion to minutes. 
+	// This is an embedded device, so its better to do any complex math 
+	// up front rather than in real time. 
+	//
 	// Note:   This table looks a little funny because there is bonus
 	// time built in due to rounding up the time limits per ACP. 
 	// For a 200k and 400k, you get additional time ( 10m and 20m, respectively )

@@ -1,3 +1,10 @@
 <strings>
-    <string id="AppName">WWPaceCalc</string>
+    <string id="AppName">PaceCalc</string>
+
+    <string id="intervalName">Measurement Interval</string>
+    <string id="EntireRide">EntireRide</string>
+    <string id="HalfHour">"30 Min"</string>
+    <string id="Hour">"Hour"</string>
+
+
 </strings>

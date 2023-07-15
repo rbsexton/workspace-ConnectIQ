@@ -297,30 +297,30 @@ class RandoCalcV2View extends WatchUi.DataField {
 		System.print(".");
 
 		if ( simulation_counter == 240 ) { // Bump to just under 10h surplus
-			System.println("Distance = 150km");
+			System.println("Distance = 150km c = 240");
 			simulated_distance = simulated_distance + 8.38 * 15000;
 		}
 
 		if ( simulation_counter == 180 ) { // Bump to just under 90m surplus
-			System.println("Distance = 22.5km");
+			System.println("Distance = 22.5km c = 180 ");
 			simulated_distance = simulated_distance + 1.445 * 15000;
 		}
 
-		if ( simulation_counter == 130 ) { System.println("Sim 30kph"); } 
+		if ( simulation_counter == 130 ) { System.println("Sim 30kph c = 130"); } 
 
 		if ( simulation_counter  > 130 ) {
 			simulated_distance = simulated_distance + 8.3333;
 			return;
 		}
 
-		if ( simulation_counter == 90 ) { System.println("Sim 15kph"); } 
+		if ( simulation_counter == 90 ) { System.println("Sim 15kph c = 90"); } 
 
 		if ( simulation_counter > 90 ) {
 			simulated_distance = simulated_distance + 4.15;
 			return;
 		}
 
-		if ( simulation_counter == 30 ) { System.println("Sim 30kph"); } 
+		if ( simulation_counter == 30 ) { System.println("Sim 30kph c = 30"); } 
  
 		if ( simulation_counter > 30 ) {
 			simulated_distance = simulated_distance + 8.3333;

@@ -29,10 +29,6 @@ class WWPaceCalcView extends WatchUi.SimpleDataField {
 	var   timebase_err;        // The countdown variable.
 	var   timebase_last_ms;    // Used to generate the delta. 
 
-    //var   pdp_sample_interval_ms;
-	//var   pdp_sample_timeout_ms;                 // The countdown variable.
-	//var   pdp_sample_time_last_ms; 
-
     var   pdp_sample_i;     // This points to the next value to write. 
 
     // ------------------------------------
@@ -97,7 +93,12 @@ class WWPaceCalcView extends WatchUi.SimpleDataField {
         }
     }
 
-    // Do the numerics and return the final result. 
+    // Do the numerics and return the final result.
+    // NOTE NOTE NOTE.    This all appears to be redundant, 
+    // because the things that we need are in the 'info'
+    // object.   But thats not the case, because of the circular 
+    // buffer.  
+    // The only reason to pass in 'info' is for debugging purposes.
     function analyze(info, timerTime, elapsedDistance, totalAscent) {
 
         // Calculate averate speed. 
@@ -180,11 +181,6 @@ class WWPaceCalcView extends WatchUi.SimpleDataField {
 
         // Fall through and capture a data point.
 
-         // Soooo, fill these in, and then calculate.
-        var timerTime; 
-        var elapsedDistance;
-        var totalAscent;     
-
         // Note - need to handle the pre-fill scenario - not enough data yet, 
         // but we need to tell them something. 
         var i = pdp_sample_i & data_points_mask;
@@ -192,6 +188,11 @@ class WWPaceCalcView extends WatchUi.SimpleDataField {
         data_timerTime      [i] = info.timerTime;  
         data_elapsedDistance[i] = info.elapsedDistance;
         data_totalAscent    [i] = info.totalAscent;
+
+         // Soooo, fill these in, and then calculate.
+        var timerTime; 
+        var elapsedDistance;
+        var totalAscent;     
 
         // If there are enough samples, calculate the 
         // deltas, otherwise use the aggregate numbers.

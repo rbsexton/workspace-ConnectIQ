@@ -189,25 +189,21 @@ class WWPaceCalcView extends WatchUi.SimpleDataField {
         data_elapsedDistance[i] = info.elapsedDistance;
         data_totalAscent    [i] = info.totalAscent;
 
-         // Soooo, fill these in, and then calculate.
-        var timerTime; 
-        var elapsedDistance;
-        var totalAscent;     
+        pdp_sample_i++;  // Index over to the oldest sample.
 
-        // If there are enough samples, calculate the 
+         // Fill these in and then apply any offsets if necessary.
+        var timerTime        = info.timerTime;
+        var elapsedDistance  = info.elapsedDistance;
+        var totalAscent      = info.totalAscent;     
+
+        // If there are enough samples, calculate the
         // deltas, otherwise use the aggregate numbers.
-        if ( pdp_sample_i < data_points_size ) {
-            timerTime       = info.timerTime;
-            elapsedDistance = info.elapsedDistance;
-            totalAscent     = info.totalAscent;
-            pdp_sample_i++;
-        } else {
-            pdp_sample_i++;
+        if ( pdp_sample_i >= data_points_size ) {
             i = pdp_sample_i & data_points_mask;
 
-            timerTime       = info.timerTime - data_timerTime[i];
-            elapsedDistance = info.elapsedDistance - data_elapsedDistance[i];
-            totalAscent     = info.totalAscent - data_totalAscent[i];
+            timerTime       -= data_timerTime[i];
+            elapsedDistance -= data_elapsedDistance[i];
+            totalAscent     -= data_totalAscent[i];
         }
 
         ww_pace = analyze(info, timerTime, elapsedDistance, totalAscent);

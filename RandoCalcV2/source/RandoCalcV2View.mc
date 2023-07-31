@@ -2,6 +2,8 @@ using Toybox.WatchUi;
 using Toybox.Graphics;
 using Toybox.Application;
 
+import Toybox.Lang;
+
 class RandoCalcV2View extends WatchUi.DataField {
 
 	const do_simulate = 0;
@@ -227,9 +229,9 @@ class RandoCalcV2View extends WatchUi.DataField {
 	hidden var verbose; 
 	hidden var verbose_cutoff;
 
-	var        lut;
+	var        lut as Array;
 	
-	var        trend_data_banked  = new[31];
+	var        trend_data_banked as Array<Float> = new[31];
 	hidden var trend_i;
    	hidden var trend_text;
 
@@ -251,6 +253,7 @@ class RandoCalcV2View extends WatchUi.DataField {
 		if ( verbose ) { verbose_cutoff = 90.0; }
 		else           { verbose_cutoff = 60.0; } 
 
+        // Choose the look-up table. 
         which_flavor      = Application.Properties.getValue("method");
         method_name       = method_names[which_flavor];     
 
@@ -431,14 +434,16 @@ class RandoCalcV2View extends WatchUi.DataField {
         // Use the generic, centered layout
         } else {
             View.setLayout(Rez.Layouts.MainLayout(dc));
-            var labelView = View.findDrawableById("label");
+            var labelView = View.findDrawableById("label") as WatchUi.Text;
+
             labelView.locY = labelView.locY - 16;
-            var valueView = View.findDrawableById("value");
+            var valueView = View.findDrawableById("value") as WatchUi.Text;
+ 
             valueView.locY = valueView.locY + 7;
         }
 
         View.findDrawableById("label").setText(Rez.Strings.label);
-        return true;
+        return;
     }
 
     // Display the value you computed here. This will be called

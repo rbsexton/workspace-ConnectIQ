@@ -16,7 +16,7 @@ class WWPaceCalcView extends WatchUi.SimpleDataField {
 
     // -----------------------------------
     // Data points. 
-	var data_elapsedTime;
+	var data_timerTime;
 	var data_elapsedDistance;
 	var data_totalAscent;
     
@@ -56,7 +56,7 @@ class WWPaceCalcView extends WatchUi.SimpleDataField {
         // TODO Add code here to look things up.
         // Zero means 'Whole Ride'
 
-        data_elapsedTime     = new [ data_points_size ]; 
+        data_timerTime       = new [ data_points_size ]; 
         data_elapsedDistance = new [ data_points_size ]; 
         data_totalAscent     = new [ data_points_size ]; 
     
@@ -64,7 +64,7 @@ class WWPaceCalcView extends WatchUi.SimpleDataField {
 
         sample_interval_minutes = Application.Properties.getValue("interval");
 
-        sample_interval_minutes = 30; 
+        sample_interval_minutes = 240; 
 
         // Calculate the update interface for the main timing loop.  
         // there are 64 samples.
@@ -74,7 +74,7 @@ class WWPaceCalcView extends WatchUi.SimpleDataField {
 
         timebase_err         = timebase_interval_ms / 2; 
 
-        label = "Pace";
+        label = "Pace240";
 
     }
 
@@ -98,11 +98,11 @@ class WWPaceCalcView extends WatchUi.SimpleDataField {
     }
 
     // Do the numerics and return the final result. 
-    function analyze(info, elapsedTime, elapsedDistance, totalAscent) {
+    function analyze(info, timerTime, elapsedDistance, totalAscent) {
 
         // Calculate averate speed. 
-        elapsedTime /= 1000.0; // Seconds. 
-        var averageSpeed = elapsedDistance / elapsedTime;
+        timerTime /= 1000.0; // Seconds. 
+        var averageSpeed = elapsedDistance / timerTime;
         var avg_mph      = 2.23694 * averageSpeed;
 
         // Western Wheelers Pace: Average Speed + Hilliness
@@ -117,7 +117,7 @@ class WWPaceCalcView extends WatchUi.SimpleDataField {
 
         {
             var speed_mph = info.currentSpeed * 2.23694;
-            System.print  ("t=" + elapsedTime + ",v=" + speed_mph + ",avg=");
+            System.print  ("t=" + timerTime + ",v=" + speed_mph + ",avg=");
             System.println(avg_mph + ",climb=" + totalAscent);
         }
 
@@ -161,9 +161,9 @@ class WWPaceCalcView extends WatchUi.SimpleDataField {
         // 4. Window mode, sample  
 
         // If this is operating in full-ride mode, 
-        // calculate now and return. 
+        // update wwpace now and return. 
         if ( sample_interval_minutes == 0 ) {
-            ww_pace = analyze(info, info.elapsedTime, info.elapsedDistance, info.totalAscent);
+            ww_pace = analyze(info, info.timerTime, info.elapsedDistance, info.totalAscent);
             return(ww_pace);
         } 
 
@@ -173,13 +173,15 @@ class WWPaceCalcView extends WatchUi.SimpleDataField {
             if (pdp_sample_i > data_points_size) { // Full dataset case. 
                 return(ww_pace);
             } else {
-                ww_pace = analyze(info, info.elapsedTime, info.elapsedDistance, info.totalAscent);
+                ww_pace = analyze(info, info.timerTime, info.elapsedDistance, info.totalAscent);
                 return(ww_pace);
             }
         }
 
+        // Fall through and capture a data point.
+
          // Soooo, fill these in, and then calculate.
-        var elapsedTime; 
+        var timerTime; 
         var elapsedDistance;
         var totalAscent;     
 
@@ -187,14 +189,14 @@ class WWPaceCalcView extends WatchUi.SimpleDataField {
         // but we need to tell them something. 
         var i = pdp_sample_i & data_points_mask;
 
-        data_elapsedTime    [i] = info.elapsedTime;  
+        data_timerTime      [i] = info.timerTime;  
         data_elapsedDistance[i] = info.elapsedDistance;
         data_totalAscent    [i] = info.totalAscent;
 
         // If there are enough samples, calculate the 
         // deltas, otherwise use the aggregate numbers.
         if ( pdp_sample_i < data_points_size ) {
-            elapsedTime     = info.elapsedTime;
+            timerTime       = info.timerTime;
             elapsedDistance = info.elapsedDistance;
             totalAscent     = info.totalAscent;
             pdp_sample_i++;
@@ -202,12 +204,12 @@ class WWPaceCalcView extends WatchUi.SimpleDataField {
             pdp_sample_i++;
             i = pdp_sample_i & data_points_mask;
 
-            elapsedTime     = info.elapsedTime - data_elapsedTime[i];
+            timerTime       = info.timerTime - data_timerTime[i];
             elapsedDistance = info.elapsedDistance - data_elapsedDistance[i];
             totalAscent     = info.totalAscent - data_totalAscent[i];
         }
 
-        ww_pace = analyze(info, elapsedTime, elapsedDistance, totalAscent);
+        ww_pace = analyze(info, timerTime, elapsedDistance, totalAscent);
         return(ww_pace);
 
 		// A little debug code, since retired.                

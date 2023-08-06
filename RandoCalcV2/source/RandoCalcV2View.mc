@@ -220,9 +220,6 @@ class RandoCalcV2View extends WatchUi.DataField {
         
 	hidden var table_entry;
 	
-	hidden var simulated_distance;
-	hidden var simulation_counter;
-	
 	hidden var which_flavor;
 	var        method_name;
 	
@@ -291,49 +288,50 @@ class RandoCalcV2View extends WatchUi.DataField {
 	// General Plan:
 	// Start, 0 kph for 30s
 	// 30 kph for 30s 
-
-	function simulate() {
-	
-		if ( do_simulate != 1 ) { return; } 
-
-		simulation_counter++;
-		System.print(".");
-
-		if ( simulation_counter == 240 ) { // Bump to just under 10h surplus
-			System.println("Distance = 150km c = 240");
-			simulated_distance = simulated_distance + 8.38 * 15000;
-		}
-
-		if ( simulation_counter == 180 ) { // Bump to just under 90m surplus
-			System.println("Distance = 22.5km c = 180 ");
-			simulated_distance = simulated_distance + 1.445 * 15000;
-		}
-
-		if ( simulation_counter == 130 ) { System.println("Sim 30kph c = 130"); } 
-
-		if ( simulation_counter  > 130 ) {
-			simulated_distance = simulated_distance + 8.3333;
-			return;
-		}
-
-		if ( simulation_counter == 90 ) { System.println("Sim 15kph c = 90"); } 
-
-		if ( simulation_counter > 90 ) {
-			simulated_distance = simulated_distance + 4.15;
-			return;
-		}
-
-		if ( simulation_counter == 30 ) { System.println("Sim 30kph c = 30"); } 
  
-		if ( simulation_counter > 30 ) {
-			simulated_distance = simulated_distance + 8.3333;
-			return;
-		}
-		
-		// Otherwise no movement.   
+    const simspeed15 = 250.0;  // 15kph = 250 m/minute.
 
-	}
-				
+    hidden var simulated_distance = 0.0;  // Meters 
+    hidden var simulated_speed    = 0.0;  // Meters/s
+    hidden var simulation_counter = 0;    // Minutes
+
+    (:debug)
+    function simulate() {
+
+        if ( do_simulate != 1 ) { return; } 
+
+        switch(simulation_counter) {
+            case 0:  // Count down from 0 to -10m
+                System.println("Sim 0 kph c = 0");
+                simulated_speed = 0.0;
+                break;  
+            case 10:  // Hold pretty steady 
+                System.println("Sim 15kph @ c = 15");
+                simulated_speed = simspeed15;
+                break;
+            case 30:  
+                System.println("Sim 60kph @ c = 30");
+                simulated_speed = simspeed15 * 4.0;
+                break;
+            case 90:
+                System.println("Sim 30kph @ c = 90 Distance = 22.5km");
+                simulated_distance = simulated_distance + 1.445 * 15000;
+                break;
+            case 120:
+                System.println("Distance = 150km c = 240");
+                simulated_distance = simulated_distance + 8.38 * 15000;
+            default:
+                simulated_distance = simulated_distance + simulated_speed;
+        }
+
+        simulation_counter++;
+        System.print(".");
+    }
+                
+    // ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
     function compute(info) {
 
 		var distance;
@@ -356,7 +354,7 @@ class RandoCalcV2View extends WatchUi.DataField {
 	   		elapsed_mins = (info.elapsedTime * .0000166666 );
 		}	
 		else { 
-	   		elapsed_mins = (info.timerTime * .0000166666 );
+	   		elapsed_mins = simulation_counter;
 
 			// System.println( "dist: " + distance + " mins: " + elapsed_mins);
 		}

@@ -6,7 +6,7 @@ import Toybox.Lang;
 
 class RandoCalcV2View extends WatchUi.DataField {
 
-	const do_simulate = 0;
+	const do_simulate = 1;
 
 	// -------------------------------------------------------------------------
 	// Look up tables.
@@ -44,6 +44,8 @@ class RandoCalcV2View extends WatchUi.DataField {
 
     // -------------------------------------------------------------
     // PBP
+    // Raw PBP data in a google sheet:
+    // https://docs.google.com/spreadsheets/d/1jlxB4iT0GtjdmqXfRqaqDyj7bTXQCDimbuHuwPGiApo/edit?usp=sharing
     // -------------------------------------------------------------
 
     /* PBP 2023 */ 
@@ -338,7 +340,7 @@ class RandoCalcV2View extends WatchUi.DataField {
                 simulated_speed = simspeed15 * 4.0;
                 break;
             case 90:
-                System.println("Sim 30kph @ c = 90 Distance = 22.5km");
+                System.println("Sim 30kph @c = 90 Distance = 22.5km");
                 simulated_distance = simulated_distance + 1.445 * 15000;
                 break;
             case 120:

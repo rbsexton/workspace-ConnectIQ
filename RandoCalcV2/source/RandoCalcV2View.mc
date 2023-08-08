@@ -555,7 +555,9 @@ class RandoCalcV2View extends WatchUi.DataField {
  				View.findDrawableById("value").setColor(Graphics.COLOR_WHITE); 			
     			}
 
-			View.findDrawableById("label").setText("Late " + method_name);
+            // August 2023- Make a shorter label for watches.
+            // View.findDrawableById("label").setText("Late " + method_name);
+            View.findDrawableById("label").setText("Late");
     		}
  		else { 
  			if ( getBackgroundColor() == Graphics.COLOR_BLACK ) {
@@ -570,8 +572,10 @@ class RandoCalcV2View extends WatchUi.DataField {
     			View.findDrawableById("label").setColor(Graphics.COLOR_BLACK);			
  				View.findDrawableById("value").setColor(Graphics.COLOR_BLACK);
  				}
- 				
-			View.findDrawableById("label").setText("Banked " + method_name);
+ 			
+            // V3, August 2023 - A more concise label for use with watches. 
+            // View.findDrawableById("label").setText("Banked " + method_name);
+            View.findDrawableById("label").setText(method_name);
  			}   
     
         View.findDrawableById("value").setText(formatted);

@@ -13,6 +13,9 @@ The PBP calculators are based upon the timetables published by ACP, and require 
 
 You can find instructions on loading the app on the Garmin Site.  You can select the desired time rules from the Garmin Connect app on your phone or from Garmin connect on your computer.
 
+3.0.1
+ - Whoops!  Turn off display simulation mode.  Sorry.
+
 Improvements Version in 3.0.0
 - Update all the PBP Tables for 2023
 - Support for new Garmin Edge Devices

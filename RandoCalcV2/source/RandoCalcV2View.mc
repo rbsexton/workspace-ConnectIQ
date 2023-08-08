@@ -6,7 +6,7 @@ import Toybox.Lang;
 
 class RandoCalcV2View extends WatchUi.DataField {
 
-	const do_simulate = 1;
+	const do_simulate = 0;
 
 	// -------------------------------------------------------------------------
 	// Look up tables.
@@ -321,7 +321,6 @@ class RandoCalcV2View extends WatchUi.DataField {
     hidden var simulated_speed    = 0.0;  // Meters/s
     hidden var simulation_counter = 0;    // Minutes
 
-    (:debug)
     function simulate() {
 
         if ( do_simulate != 1 ) { return; } 

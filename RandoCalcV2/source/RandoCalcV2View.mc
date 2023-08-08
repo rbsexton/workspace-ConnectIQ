@@ -23,6 +23,11 @@ class RandoCalcV2View extends WatchUi.DataField {
 	// This is an embedded device, so its better to do any complex math 
 	// up front rather than in real time. 
 	//
+
+    // -------------------------------------------------------------
+    // ACP Qualifiers
+    // -------------------------------------------------------------
+
 	// Note:   This table looks a little funny because there is bonus
 	// time built in due to rounding up the time limits per ACP. 
 	// For a 200k and 400k, you get additional time ( 10m and 20m, respectively )
@@ -36,6 +41,10 @@ class RandoCalcV2View extends WatchUi.DataField {
 		[ 1000,  75.0, 13.300000576333358 ],		
 		[ 0, 0, 0 ] // Mark the end of the list.
 		];
+
+    // -------------------------------------------------------------
+    // PBP
+    // -------------------------------------------------------------
 
     /* PBP 2023 */ 
 	const pbp_90_lut = [
@@ -175,10 +184,17 @@ class RandoCalcV2View extends WatchUi.DataField {
 		[ 0, 0, 0 ] 
 		];
 
+    // -------------------------------------------------------------
+    // Straight Time, eg: SIR events.
+    // -------------------------------------------------------------
 	const straight_90_lut = [ // (90*60) / 1200000 
 		[ 0, 0, 13.33333 ],
 		[ 0, 0, 0 ] 
 		];
+
+    // -------------------------------------------------------------
+    // RUSA Permanents. 
+    // -------------------------------------------------------------
 
 	// Table from https://rusa.org/octime_perm.html
 	//    0-699 15kph 
@@ -195,6 +211,10 @@ class RandoCalcV2View extends WatchUi.DataField {
 		[ 0, 0, 0 ] 
 		];
 
+    // -------------------------------------------------------------
+    // LEL
+    // -------------------------------------------------------------
+
 	// LEL 125h Rules.   Straight time, 1520km in 125h
 	// LEL 2022 Final, with route changes 2022-07-31.   1520km in 125h 
 	const lel125_lut = [
@@ -203,6 +223,10 @@ class RandoCalcV2View extends WatchUi.DataField {
 		   [ 0, 0, 12.0000000000000  ], // 1540km in 128.333h = 12kph
 		   [ 0, 0, 0 ] 
 		];
+
+    // -------------------------------------------------------------
+    // Tables of tables.
+    // -------------------------------------------------------------
 
 	// These lists will be indexed by the user config settings.
 	const luts = [acp_90_lut, pbp_90_lut, pbp_84_lut, pbp_80_lut, straight_90_lut , rusa_lut, lel125_lut ];

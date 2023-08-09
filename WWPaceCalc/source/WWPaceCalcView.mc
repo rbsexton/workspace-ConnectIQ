@@ -1,18 +1,88 @@
 using Toybox.WatchUi;
 
+
+// -----------------------------------
+// Primary data point collection.
+const data_points_size = 64;  // ATTN! Must be 2^N
+const data_points_mask = data_points_size - 1;  
+
 // ------------------------------------------------------------
 // Sampling theory.    
 // The unit of measurement is Milliseconds, so its not really possible 
 // to do long intervals and get the math right for 32-bit numbers 
 // Plan - Generate a once per minute signal and divided that down. 
+class MovingAverage {
+    var pdp_sample_i;          // This points to the next value to write. 
 
+    var data_timerTime;
+    var data_elapsedDistance;
+    var data_totalAscent;
 
-class WWPaceCalcView extends WatchUi.SimpleDataField {
+    var ww_pace;
 
     // -----------------------------------
-	// Primary data point collection.
-	const data_points_size = 64;  // ATTN! Must be 2^N
-	const data_points_mask = data_points_size - 1;  
+    // SAMPLE INTERPOLATOR 
+	// The timeout determines the baseline sampling rate.
+    // Keep at most a hour of data.
+    // -----------------------------------
+    var   timebase_interval_ms;  
+	var   timebase_err;        // The countdown variable.
+	var   timebase_last_ms;    // Used to generate the delta. 
+
+    var   interpd;             // Keep state.   
+
+    function initialize(sample_interval_minutes) {
+        pdp_sample_i = 0;
+
+        data_timerTime       = new [ data_points_size ]; 
+        data_elapsedDistance = new [ data_points_size ]; 
+        data_totalAscent     = new [ data_points_size ]; 
+
+        ww_pace      = 0.0;
+
+        // Calculate the update interface for the main timing loop.  
+        // there are 64 samples.
+        timebase_last_ms = 0; 
+        timebase_interval_ms = ( sample_interval_minutes * 60.0 ) / data_points_size;  
+        timebase_interval_ms *= 1000;
+
+        timebase_err         = timebase_interval_ms / 2; 
+    }
+
+    function interpolate(now) {
+        var duration = now - timebase_last_ms;
+        timebase_last_ms = now;
+
+        timebase_err -= duration; // Use Bresenhams Algorithm.
+
+        if ( timebase_err  <= 0 ) {
+            timebase_err += timebase_interval_ms;
+            interpd = 1;
+        }
+        else {
+            interpd = 0;
+        }
+    }
+
+    function add_sample(tTime, eDistance, totAscent) {
+        var i = pdp_sample_i & data_points_mask;
+
+        data_timerTime      [i] = tTime;  
+        data_elapsedDistance[i] = eDistance;
+        data_totalAscent    [i] = totAscent;
+
+        pdp_sample_i++;
+    }
+
+    function interp_ready() {
+        return ( pdp_sample_i >= data_points_size );
+    }
+}
+
+// ---------------------------------------------------------------
+// Primary Class
+// ---------------------------------------------------------------
+class WWPaceCalcView extends WatchUi.SimpleDataField {
 
     // -----------------------------------
     // Data points. 
@@ -20,16 +90,7 @@ class WWPaceCalcView extends WatchUi.SimpleDataField {
 	var data_elapsedDistance;
 	var data_totalAscent;
     
-    // -----------------------------------
-    // SAMPLE INTERPOLATOR 
-	// The timeout determines the baseline sampling rate.
-    // Keep at most a hour of data.
-
-    var   timebase_interval_ms;  
-	var   timebase_err;        // The countdown variable.
-	var   timebase_last_ms;    // Used to generate the delta. 
-
-    var   pdp_sample_i;     // This points to the next value to write. 
+    var interp240; // The interpolator.
 
     // ------------------------------------
     // Keep state across invocations, to avoid 
@@ -47,50 +108,13 @@ class WWPaceCalcView extends WatchUi.SimpleDataField {
         
         SimpleDataField.initialize();
 
-        pdp_sample_i = 0; 
+        interp240 = new MovingAverage(240);
         
         // TODO Add code here to look things up.
         // Zero means 'Whole Ride'
-
-        data_timerTime       = new [ data_points_size ]; 
-        data_elapsedDistance = new [ data_points_size ]; 
-        data_totalAscent     = new [ data_points_size ]; 
-    
-        ww_pace = 0.0; 
-
         sample_interval_minutes = Application.Properties.getValue("interval");
 
-        sample_interval_minutes = 240; 
-
-        // Calculate the update interface for the main timing loop.  
-        // there are 64 samples.
-        timebase_last_ms = 0; 
-        timebase_interval_ms = ( sample_interval_minutes * 60.0 ) / data_points_size;  
-        timebase_interval_ms *= 1000;
-
-        timebase_err         = timebase_interval_ms / 2; 
-
         label = "Pace240";
-
-    }
-
-    // Do the interpolation and return a one if its time to 
-    // capture a sample.
-
-    function interpolate() {
-        var now      = System.getTimer();
-        var duration = now - timebase_last_ms;
-        timebase_last_ms = now;
-
-        timebase_err -= duration; // Use Bresenhams Algorithm.
-
-        if ( timebase_err  <= 0 ) {
-            timebase_err += timebase_interval_ms;
-            return(1);
-        }
-        else {
-            return(0);
-        }
     }
 
     // Do the numerics and return the final result.
@@ -136,7 +160,9 @@ class WWPaceCalcView extends WatchUi.SimpleDataField {
 
         // The interpolator has to run at all times, or 
         // it will get stuck and never recover. 
-        var interpd = interpolate();
+        var now  = System.getTimer();
+
+        interp240.interpolate(now);
 
         // Check for unstarted ride and return 0. 
         if (info.totalAscent     == null ||
@@ -151,6 +177,7 @@ class WWPaceCalcView extends WatchUi.SimpleDataField {
 
         // If its too soon to collect useful data, return. 
         if ( info.elapsedDistance < 500 ) { 
+            // System.println("compute() - too soon");
             System.println("compute() - too soon ");
             return(0);
             }
@@ -161,17 +188,20 @@ class WWPaceCalcView extends WatchUi.SimpleDataField {
         // 3. Window mode, no sample -  Return Early. 
         // 4. Window mode, sample  
 
+        // TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
+        // Figure out which one to calculate and display.
+
         // If this is operating in full-ride mode, 
         // update wwpace now and return. 
-        if ( sample_interval_minutes == 0 ) {
-            ww_pace = analyze(info, info.timerTime, info.elapsedDistance, info.totalAscent);
-            return(ww_pace);
-        } 
+        // if ( sample_interval_minutes == 0 ) {
+        //     ww_pace = analyze(info, info.timerTime, info.elapsedDistance, info.totalAscent);
+        //    return(ww_pace);
+        // } 
 
         // No data point.   If we're spun up, shortcut until there is a 
         // full set of data, otherwise, calculate based upon current stats. 
-        if ( interpd == 0 ) {
-            if (pdp_sample_i > data_points_size) { // Full dataset case. 
+        if ( interp240.interpd == 0 ) {
+            if ( interp240.interp_ready() ) { // Full dataset case. 
                 return(ww_pace);
             } else {
                 ww_pace = analyze(info, info.timerTime, info.elapsedDistance, info.totalAscent);
@@ -183,27 +213,21 @@ class WWPaceCalcView extends WatchUi.SimpleDataField {
 
         // Note - need to handle the pre-fill scenario - not enough data yet, 
         // but we need to tell them something. 
-        var i = pdp_sample_i & data_points_mask;
+        interp240.add_sample(info.timerTime, info.elapsedDistance, info.totalAscent);
 
-        data_timerTime      [i] = info.timerTime;  
-        data_elapsedDistance[i] = info.elapsedDistance;
-        data_totalAscent    [i] = info.totalAscent;
-
-        pdp_sample_i++;  // Index over to the oldest sample.
-
-         // Fill these in and then apply any offsets if necessary.
+        // Fill these in and then apply any offsets if necessary.
         var timerTime        = info.timerTime;
         var elapsedDistance  = info.elapsedDistance;
         var totalAscent      = info.totalAscent;     
 
         // If there are enough samples, calculate the
         // deltas, otherwise use the aggregate numbers.
-        if ( pdp_sample_i >= data_points_size ) {
-            i = pdp_sample_i & data_points_mask;
+        if ( interp240.interp_ready() ) {
+            var i = interp240.pdp_sample_i & data_points_mask;
 
-            timerTime       -= data_timerTime[i];
-            elapsedDistance -= data_elapsedDistance[i];
-            totalAscent     -= data_totalAscent[i];
+            timerTime       -= interp240.data_timerTime[i];
+            elapsedDistance -= interp240.data_elapsedDistance[i];
+            totalAscent     -= interp240.data_totalAscent[i];
         }
 
         ww_pace = analyze(info, timerTime, elapsedDistance, totalAscent);

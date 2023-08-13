@@ -54,37 +54,30 @@ function analyze(timerTime, elapsedDistance, totalAscent) as Float {
 // ---------------------------------------------------------------
 // ---------------------------------------------------------------
 class MovingAverage {
-    var pdp_sample_i;         // This points to the next value to write. 
+    var pdp_sample_i as Number = 0;    // This points to the next value to write. 
 
-    var data_timerTime       ;
-    var data_elapsedDistance ;
-    var data_totalAscent     ;
+    var data_timerTime       = new Array<Number>[data_points_size];
+    var data_elapsedDistance = new Array<Float>[data_points_size];
+    var data_totalAscent     = new Array<Float>[data_points_size];
     
-    var ww_pace;
+    var ww_pace as Float = 0.0;
 
     // -----------------------------------
     // SAMPLE INTERPOLATOR 
 	// The timeout determines the baseline sampling rate.
     // Keep at most a hour of data.
     // -----------------------------------
-    var   timebase_interval_ms;  
-	var   timebase_err;        // The countdown variable.
-	var   timebase_last_ms;    // Used to generate the delta. 
+    var   timebase_interval_ms as Number;  
+	var   timebase_err         as Number; // The countdown variable.
+	var   timebase_last_ms     as Number; // Used to generate the delta. 
 
-    function initialize(sample_interval_minutes) {
-
-        pdp_sample_i = 0;
-        ww_pace = 0.0;
-
-        data_timerTime       = new [data_points_size];
-        data_elapsedDistance = new [data_points_size];
-        data_totalAscent     = new [data_points_size];
+    function initialize(sample_interval_minutes as Number) {
 
         // Initialize the buffers so that the calculation 
         // code can run from the very beginning.
         var i = 0; 
         for ( i = 0; i < data_points_size; i++) {
-            data_timerTime      [i] =   0; // This shows up as a 'number' 
+            data_timerTime      [i] = 0; // This shows up as a 'number' 
             data_elapsedDistance[i] = 0.0; 
             data_totalAscent    [i] = 0.0; 
         }
@@ -92,19 +85,19 @@ class MovingAverage {
         // Calculate the update interface for the main timing loop.  
         // there are 64 samples.
         timebase_last_ms = 0; 
-        timebase_interval_ms = ( sample_interval_minutes * 60.0 ) / data_points_size;  
+        timebase_interval_ms = ( sample_interval_minutes * 60 ) / data_points_size;  
         timebase_interval_ms *= 1000;
 
         timebase_err         = timebase_interval_ms / 2; 
     }
 
-    function interp_ready() {
+    function interp_ready() as Boolean {
         return ( pdp_sample_i >= data_points_size );
     }
 
     // Update the running timebase/iterpolator. 
     // return a 1 if its time to add a new sample.
-    function interpolate(now) {
+    function interpolate(now as Number) as Boolean {
         var duration = now - timebase_last_ms;
         timebase_last_ms = now;
 
@@ -112,15 +105,15 @@ class MovingAverage {
 
         if ( timebase_err  <= 0 ) {
             timebase_err += timebase_interval_ms;
-            return(1);
+            return(true);
         }
         else {
-            return(0);
+            return(false);
         }
     }
 
     // Add a sample and return the new pace information.
-    function add_sample(tTime, eDistance, totAscent) {
+    function add_sample(tTime as Number, eDistance as Float, totAscent as Float) as Void {
         var i = pdp_sample_i & data_points_mask;
 
         data_timerTime      [i] = tTime;  
@@ -131,7 +124,7 @@ class MovingAverage {
     }
 
     // Call this every time.  If something changes, update wwpace.
-    function service(now, tTime, eDistance, totAscent) {
+    function service(now as Number, tTime as Number, eDistance as Float, totAscent as Float) as Void {
         if ( self.interpolate(now) ) {
             self.add_sample(tTime, eDistance, totAscent);
 

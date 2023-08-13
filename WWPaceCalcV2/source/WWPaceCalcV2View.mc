@@ -150,11 +150,59 @@ class MovingAverage {
 
 class WWPaceCalcV2View extends WatchUi.DataField {
 
+    var Pace; // This gets displayed.
+
+    var         interp = new Array<MovingAverage>[6];
+    const method_names = ["WWPace", "Pace 1H", "Pace 2H", "Pace 4H", "Pace 8H", "24H"];
+
+    // ------------------------------------
+    // Display Logic.
+
+    var   d_cycle      = 15; // Count this down to cycle the field. 
+    const d_cycle_init = 15; // Reset Value. 
+
+    var   d_index     = 0;  // Zero means 'Whole Ride'  Matches the labels.
+    const d_index_max = 5;
+
+
     hidden var mValue as Numeric;
 
     function initialize() {
         DataField.initialize();
+
+        System.println("Starting");
+        
+        interp[1] = new MovingAverage(  60); // 1
+        interp[2] = new MovingAverage( 120); // 2
+        interp[3] = new MovingAverage( 240); // 4
+        interp[4] = new MovingAverage( 480); // 8
+        interp[5] = new MovingAverage(1440); // 24
+
         mValue = 0.0f;
+    }
+
+    // ----------------------------------------
+    // ----------------------------------------
+    function next_display() {
+        d_cycle = d_cycle - 1; 
+        if ( d_cycle > 0 ) {
+            return;
+            } 
+
+        // Otherwise get to work. 
+        d_cycle = d_cycle_init;
+
+        d_index = d_index + 1; 
+        if ( d_index > d_index_max ) {
+            d_index = 0; 
+        }
+
+        // Now check for validity.  If non-zero and not ready, reset to zero. 
+        if ( d_index && !interp[d_index].interp_ready() ) {
+            d_index = 0; 
+            }
+
+        // self.label = method_names[d_index];
     }
 
     // Set your layout here. Anytime the size of obscurity of
@@ -187,7 +235,9 @@ class WWPaceCalcV2View extends WatchUi.DataField {
             valueView.locY = valueView.locY + 7;
         }
 
-        (View.findDrawableById("label") as Text).setText(Rez.Strings.label);
+        // (View.findDrawableById("label") as Text).setText(Rez.Strings.label);
+        (View.findDrawableById("label") as Text).setText(method_names[d_index]);
+
     }
 
     // The given info object contains all the current workout information.
@@ -195,14 +245,58 @@ class WWPaceCalcV2View extends WatchUi.DataField {
     // Note that compute() and onUpdate() are asynchronous, and there is no
     // guarantee that compute() will be called before onUpdate().
     function compute(info as Activity.Info) as Void {
-        // See Activity.Info in the documentation for available information.
-        if(info has :currentHeartRate){
-            if(info.currentHeartRate != null){
-                mValue = info.currentHeartRate as Number;
-            } else {
-                mValue = 0.0f;
+
+        next_display();
+
+        // The interpolator has to run at all times, or 
+        // it will get stuck and never recover. 
+        var now  = System.getTimer();
+
+        // All hell breaks loose when now = 0, because divide by zero.
+        if ( now == 0 ) { Pace = 0.0; return; }
+
+        // Check for unstarted ride and return 0. 
+        if (info.totalAscent     == null ||
+            info.elapsedDistance == null ||
+            info.averageSpeed    == null ) {
+            System.println("compute() - nulls");
+    
+            interp[1].service(now, info.timerTime, 0, 0);
+            interp[2].service(now, info.timerTime, 0, 0);
+            interp[3].service(now, info.timerTime, 0, 0);
+            interp[4].service(now, info.timerTime, 0, 0);
+            interp[5].service(now, info.timerTime, 0, 0);
+
+            Pace = 0.0;
+        	return;			        
+			}             
+
+        // Otherwise, normalcy. 
+        interp[1].service(now, info.timerTime, info.elapsedDistance, info.totalAscent);
+        interp[2].service(now, info.timerTime, info.elapsedDistance, info.totalAscent);
+        interp[3].service(now, info.timerTime, info.elapsedDistance, info.totalAscent);
+        interp[4].service(now, info.timerTime, info.elapsedDistance, info.totalAscent);
+        interp[5].service(now, info.timerTime, info.elapsedDistance, info.totalAscent);
+
+        // The math can produce crazy results when you don't 
+        // have enough data, so don't calculate that.
+
+        // If its too soon to collect useful data, return. 
+        if ( info.elapsedDistance < 500 ) { 
+            // System.println("compute() - too soon");
+            System.println("compute() - too soon ");
+            Pace = 0.0;
+            return;
             }
+
+        if ( d_index ) {
+            Pace = interp[d_index].ww_pace;
+            return; 
+        } else {
+            Pace = analyze(info.timerTime, info.elapsedDistance, info.totalAscent);
+            return;
         }
+
     }
 
     // Display the value you computed here. This will be called
@@ -218,7 +312,9 @@ class WWPaceCalcV2View extends WatchUi.DataField {
         } else {
             value.setColor(Graphics.COLOR_BLACK);
         }
-        value.setText(mValue.format("%.2f"));
+        value.setText(Pace.format("%2.2f"));
+
+        (View.findDrawableById("label") as Text).setText(method_names[d_index]);
 
         // Call parent's onUpdate(dc) to redraw the layout
         View.onUpdate(dc);

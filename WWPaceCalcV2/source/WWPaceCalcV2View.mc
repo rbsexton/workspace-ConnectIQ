@@ -164,9 +164,6 @@ class WWPaceCalcV2View extends WatchUi.DataField {
     var   d_index     = 0;  // Zero means 'Whole Ride'  Matches the labels.
     const d_index_max = 5;
 
-
-    hidden var mValue as Numeric;
-
     function initialize() {
         DataField.initialize();
 
@@ -177,8 +174,6 @@ class WWPaceCalcV2View extends WatchUi.DataField {
         interp[3] = new MovingAverage( 240); // 4
         interp[4] = new MovingAverage( 480); // 8
         interp[5] = new MovingAverage(1440); // 24
-
-        mValue = 0.0f;
     }
 
     // ----------------------------------------
@@ -198,7 +193,7 @@ class WWPaceCalcV2View extends WatchUi.DataField {
         }
 
         // Now check for validity.  If non-zero and not ready, reset to zero. 
-        if ( d_index && !interp[d_index].interp_ready() ) {
+        if ( d_index != 0 && !interp[d_index].interp_ready() ) {
             d_index = 0; 
             }
 

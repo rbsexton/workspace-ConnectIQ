@@ -1,16 +1,22 @@
 using Toybox.WatchUi;
 
-
-// -----------------------------------
+// ---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Primary data point collection.
+// ---------------------------------------------------------------
+// ---------------------------------------------------------------
 const data_points_size = 64;  // ATTN! Must be 2^N
 const data_points_mask = data_points_size - 1;  
 
+// ---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Do the numerics and return the final result.
 // NOTE NOTE NOTE.    This all appears to be redundant, 
 // because the things that we need are in the 'info'
 // object.   But thats not the case, because of the circular 
 // buffer.  
+// ---------------------------------------------------------------
+// ---------------------------------------------------------------
 function analyze(timerTime, elapsedDistance, totalAscent) {
 
     // Calculate averate speed. 
@@ -37,20 +43,23 @@ function analyze(timerTime, elapsedDistance, totalAscent) {
     return(pace);
     }
 
-
-
+// ---------------------------------------------------------------
+// ---------------------------------------------------------------
 // ------------------------------------------------------------
 // Sampling theory.    
 // The unit of measurement is Milliseconds, so its not really possible 
 // to do long intervals and get the math right for 32-bit numbers 
 // Plan - Generate a once per minute signal and divided that down. 
+// ---------------------------------------------------------------
+// ---------------------------------------------------------------
+// ---------------------------------------------------------------
 class MovingAverage {
-    var pdp_sample_i;          // This points to the next value to write. 
+    var pdp_sample_i;         // This points to the next value to write. 
 
-    var data_timerTime;
-    var data_elapsedDistance;
-    var data_totalAscent;
-
+    var data_timerTime       ;
+    var data_elapsedDistance ;
+    var data_totalAscent     ;
+    
     var ww_pace;
 
     // -----------------------------------
@@ -63,13 +72,13 @@ class MovingAverage {
 	var   timebase_last_ms;    // Used to generate the delta. 
 
     function initialize(sample_interval_minutes) {
+
         pdp_sample_i = 0;
+        ww_pace = 0.0;
 
-        data_timerTime       = new [ data_points_size ]; 
-        data_elapsedDistance = new [ data_points_size ]; 
-        data_totalAscent     = new [ data_points_size ]; 
-
-        ww_pace      = 0.0;
+        data_timerTime       = new [data_points_size];
+        data_elapsedDistance = new [data_points_size];
+        data_totalAscent     = new [data_points_size];
 
         // Initialize the buffers so that the calculation 
         // code can run from the very beginning.
@@ -87,6 +96,10 @@ class MovingAverage {
         timebase_interval_ms *= 1000;
 
         timebase_err         = timebase_interval_ms / 2; 
+    }
+
+    function interp_ready() {
+        return ( pdp_sample_i >= data_points_size );
     }
 
     // Update the running timebase/iterpolator. 
@@ -122,10 +135,16 @@ class MovingAverage {
         if ( self.interpolate(now) ) {
             self.add_sample(tTime, eDistance, totAscent);
 
+            // Make sure that there is enough data.
+            if ( pdp_sample_i < data_points_size ) {
+                ww_pace = 0.0;
+                return; 
+            }
+
             var t0  =   pdp_sample_i       & data_points_mask; // Oldest.
             var t   = ( pdp_sample_i - 1 ) & data_points_mask; // Now.
 
-            var time   = data_timerTime[t] - data_timerTime[t0];  
+            var time   = data_timerTime[t] - data_timerTime[t0];
             var dist   = data_elapsedDistance[t] - data_elapsedDistance[t0];
             var ascent = data_totalAscent[t] - data_totalAscent[t0];
             
@@ -134,59 +153,91 @@ class MovingAverage {
         }
     }
 
-    function interp_ready() {
-        return ( pdp_sample_i >= data_points_size );
-    }
 }
 
 // ---------------------------------------------------------------
+// ---------------------------------------------------------------
+// ---------------------------------------------------------------
 // Primary Class
+// ---------------------------------------------------------------
+// ---------------------------------------------------------------
 // ---------------------------------------------------------------
 class WWPaceCalcView extends WatchUi.SimpleDataField {
 
-    // -----------------------------------
-    // Data points. 
-	var data_timerTime;
-	var data_elapsedDistance;
-	var data_totalAscent;
-    
-    var interp240; // The interpolator.
+    var Pace; // This gets displayed.
+
+    var         interp = [ null,      null,     null,     null,     null,  null ];
+    const method_names = ["Pace", "Pace 1", "Pace 2", "Pace 4", "Pace 8", "24 H"];
 
     // ------------------------------------
-    // Keep state across invocations, to avoid 
-    // calculations when there is no new data. 
-    var   ww_pace; 
+    // Display Logic.
 
-    // ------------------------------------
-    // This is the knob that indicates how 
-    // long the measurement window is. 
-    var sample_interval_minutes; 
+    var   d_cycle      = 15; // Count this down to cycle the field. 
+    const d_cycle_init = 15; // Reset Value. 
 
+    var   d_index     = 0;  // Zero means 'Whole Ride'  Matches the labels.
+    const d_index_max = 5;
+
+    // ----------------------------------------
     // Set the label of the data field here.
+    // ----------------------------------------
     function initialize() {
         System.println("Starting");
         
         SimpleDataField.initialize();
 
-        interp240 = new MovingAverage(240);
-        
+        interp[1] = new MovingAverage(   1); // 1
+        interp[2] = new MovingAverage(   2); // 2
+        interp[3] = new MovingAverage( 240); // 4
+        interp[4] = new MovingAverage( 480); // 8
+        interp[5] = new MovingAverage(1440); // 24
+
         // TODO Add code here to look things up.
         // Zero means 'Whole Ride'
-        sample_interval_minutes = Application.Properties.getValue("interval");
 
-        label = "Pace240";
+        // label = "<>";
     }
 
+    // ----------------------------------------
+    // ----------------------------------------
+    function next_display() {
+        d_cycle = d_cycle - 1; 
+        if ( d_cycle > 0 ) {
+            return;
+            } 
 
+        // Otherwise get to work. 
+        d_cycle = d_cycle_init;
+
+        d_index = d_index + 1; 
+        if ( d_index > d_index_max ) {
+            d_index = 0; 
+        }
+
+        // Now check for validity.  If non-zero and not ready, reset to zero. 
+        if ( d_index && !interp[d_index].interp_ready() ) {
+            d_index = 0; 
+            }
+
+        // self.label = method_names[d_index];
+    }
+
+    // ----------------------------------------
     // The given info object contains all the current workout
     // information. Calculate a value and return it in this method.
     // Note that compute() and onUpdate() are asynchronous, and there is no
     // guarantee that compute() will be called before onUpdate().
+    // ----------------------------------------
     function compute(info) {
+
+        next_display();
 
         // The interpolator has to run at all times, or 
         // it will get stuck and never recover. 
         var now  = System.getTimer();
+
+        // All hell breaks loose when now = 0, because divide by zero.
+        if ( now == 0 ) { Pace = 0.0; return(Pace); }
 
         // Check for unstarted ride and return 0. 
         if (info.totalAscent     == null ||
@@ -194,13 +245,22 @@ class WWPaceCalcView extends WatchUi.SimpleDataField {
             info.averageSpeed    == null ) {
             System.println("compute() - nulls");
     
-            interp240.service(now, info.timerTime, 0, 0);
+            interp[1].service(now, info.timerTime, 0, 0);
+            interp[2].service(now, info.timerTime, 0, 0);
+            interp[3].service(now, info.timerTime, 0, 0);
+            interp[4].service(now, info.timerTime, 0, 0);
+            interp[5].service(now, info.timerTime, 0, 0);
 
-        	return(0);			        
+            Pace = 0.0;
+        	return(Pace);			        
 			}             
 
         // Otherwise, normalcy. 
-        interp240.service(now, info.timerTime, info.elapsedDistance, info.totalAscent);
+        interp[1].service(now, info.timerTime, info.elapsedDistance, info.totalAscent);
+        interp[2].service(now, info.timerTime, info.elapsedDistance, info.totalAscent);
+        interp[3].service(now, info.timerTime, info.elapsedDistance, info.totalAscent);
+        interp[4].service(now, info.timerTime, info.elapsedDistance, info.totalAscent);
+        interp[5].service(now, info.timerTime, info.elapsedDistance, info.totalAscent);
 
         // The math can produce crazy results when you don't 
         // have enough data, so don't calculate that.
@@ -209,18 +269,18 @@ class WWPaceCalcView extends WatchUi.SimpleDataField {
         if ( info.elapsedDistance < 500 ) { 
             // System.println("compute() - too soon");
             System.println("compute() - too soon ");
-            return(0);
+            Pace = 0.0;
+            return(Pace);
             }
 
-        // No data point.   If we're spun up, shortcut until there is a 
-        // full set of data, otherwise, calculate based upon current stats. 
-        if ( interp240.interp_ready() ) { // Full dataset case. 
-                return(interp240.ww_pace);
+        if ( d_index ) {
+            Pace = interp[d_index].ww_pace;
+            return(Pace); 
         } else {
-            ww_pace = analyze(info.timerTime, info.elapsedDistance, info.totalAscent);
-            return(ww_pace);
+            Pace = analyze(info.timerTime, info.elapsedDistance, info.totalAscent);
+            return(Pace);
         }
-        
+
 
 		// A little debug code, since retired.                
    		// itemcount = itemcount + 1;
@@ -234,5 +294,18 @@ class WWPaceCalcView extends WatchUi.SimpleDataField {
    		//	Sys.println(hilliness); 
 		//	}			
     }
+
+    // Display the value you computed here. This will be called
+    // once a second when the data field is visible.
+    //function onUpdate(dc) {
+
+        //var formatted =  Pace.format("%2.1f");  
+        //View.findDrawableById("value").setText(formatted);
+        // View.findDrawableById("label").setText("Label");
+
+        // Paint the screen.        
+        //View.onUpdate(dc);
+    // }
+
 
 }

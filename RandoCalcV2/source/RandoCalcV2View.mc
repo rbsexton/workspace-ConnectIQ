@@ -258,9 +258,14 @@ class RandoCalcV2View extends WatchUi.DataField {
 	hidden var trend_i;
    	hidden var trend_text;
 
+    private var _late_message as String;
+
     // Set the label of the data field here.
     function initialize() {
         DataField.initialize();
+
+        _late_message = WatchUi.loadResource($.Rez.Strings.late) as String;
+
         BankedTime        = 0.0f;
         PreviousBanked    = 0.0f;
         table_entry       = 0;
@@ -558,7 +563,7 @@ class RandoCalcV2View extends WatchUi.DataField {
 
             // August 2023- Make a shorter label for watches.
             // View.findDrawableById("label").setText("Late " + method_name);
-            View.findDrawableById("label").setText("Late");
+            View.findDrawableById("label").setText(_late_message);
     		}
  		else { 
  			if ( getBackgroundColor() == Graphics.COLOR_BLACK ) {

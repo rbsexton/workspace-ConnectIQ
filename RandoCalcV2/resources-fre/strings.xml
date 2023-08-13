@@ -1,5 +1,8 @@
-<strings>
+<resources>
+    <string id="language">French</string>
     <string id="AppName">RandoCalcV3</string>
+
+    <string id="late">En retard</string>
 
     <string id="label">My Value</string>
     <string id="methodTitle">Control closing times.</string>
@@ -15,7 +18,6 @@
     <string id="ui_verbose_short">Terse: H:MM+</string>
     <string id="ui_verbose_long">Long: H:MM.M+</string>
 
-    <string id="language">English</string>
-    <string id="late">Late</string>
 
-</strings>
+</resources>
+

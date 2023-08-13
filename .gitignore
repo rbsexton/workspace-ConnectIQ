@@ -56,3 +56,5 @@ sideload
 .settings
 *.debug.xml
 *.prg
+*/bin
+*/.vscode

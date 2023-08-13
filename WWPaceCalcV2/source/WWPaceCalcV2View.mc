@@ -245,7 +245,8 @@ class WWPaceCalcV2View extends WatchUi.DataField {
 
         // The interpolator has to run at all times, or 
         // it will get stuck and never recover. 
-        var now  = System.getTimer();
+        // var now  = System.getTimer(); // This is free-running since device start.
+        var now  = info.elapsedTime; // This is 0 until you start.
 
         // All hell breaks loose when now = 0, because divide by zero.
         if ( now == 0 ) { Pace = 0.0; return; }

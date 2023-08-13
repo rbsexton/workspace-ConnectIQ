@@ -547,6 +547,35 @@ class RandoCalcV2View extends WatchUi.DataField {
 		// Add the trend indicator.
 		formatted = formatted + trend_text;
 		    	    	
+        var obscurityFlags = DataField.getObscurityFlags();
+
+        // --------------------------------------------------------
+        // Layout code from the reference apps
+        // Top left quadrant so we'll use the top left layout
+        if (obscurityFlags == (OBSCURE_TOP | OBSCURE_LEFT)) {
+            View.setLayout(Rez.Layouts.TopLeftLayout(dc));
+
+        // Top right quadrant so we'll use the top right layout
+        } else if (obscurityFlags == (OBSCURE_TOP | OBSCURE_RIGHT)) {
+            View.setLayout(Rez.Layouts.TopRightLayout(dc));
+
+        // Bottom left quadrant so we'll use the bottom left layout
+        } else if (obscurityFlags == (OBSCURE_BOTTOM | OBSCURE_LEFT)) {
+            View.setLayout(Rez.Layouts.BottomLeftLayout(dc));
+
+        // Bottom right quadrant so we'll use the bottom right layout
+        } else if (obscurityFlags == (OBSCURE_BOTTOM | OBSCURE_RIGHT)) {
+            View.setLayout(Rez.Layouts.BottomRightLayout(dc));
+
+        // Use the generic, centered layout
+        } else {
+            View.setLayout(Rez.Layouts.MainLayout(dc));
+            var labelView = View.findDrawableById("label"); // as Text;
+            labelView.locY = labelView.locY - 16;
+            var valueView = View.findDrawableById("value"); // as Text;
+            valueView.locY = valueView.locY + 7;
+        }
+
     	if ( inthehole ) {
     		if ( getBackgroundColor() == Graphics.COLOR_BLACK ) {
     			View.findDrawableById("Background").setColor(Graphics.COLOR_WHITE);

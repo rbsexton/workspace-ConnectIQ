@@ -13,9 +13,9 @@
     <string id="RUSA">RUSA</string>
     <string id="LEL125">LEL128</string>
 
-    <string id="ui_verboseTitle">Display more digits</string>
-    <string id="ui_verbose_short">Terse: H:MM+</string>
-    <string id="ui_verbose_long">Long: H:MM.M+</string>
+    <string id="ui_verboseTitle">Time Display</string>
+    <string id="ui_verbose_short">H:MM+</string>
+    <string id="ui_verbose_long">H:MM.M+</string>
 
 </resources>
 

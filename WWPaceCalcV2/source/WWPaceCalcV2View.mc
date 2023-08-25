@@ -14,7 +14,9 @@ const data_points_mask = data_points_size - 1;
 
 // ---------------------------------------------------------------
 // ---------------------------------------------------------------
-// Do the numerics 
+// Do the numerics. 
+// timerTime is assumed not to be zero, but not everything that
+// calls this code has that failure mode, so let the caller decide.
 // ---------------------------------------------------------------
 // ---------------------------------------------------------------
 function analyze(timerTime, elapsedDistance, totalAscent) as Float {
@@ -141,8 +143,11 @@ class MovingAverage {
             var dist   = data_elapsedDistance[t] - data_elapsedDistance[t0];
             var ascent = data_totalAscent[t] - data_totalAscent[t0];
             
-            ww_pace = analyze(time, dist, ascent);
-
+            if ( time == 0 ) {
+                ww_pace = 0.0;
+            } else {
+                ww_pace = analyze(time, dist, ascent);
+            }
         }
     }
 }
@@ -289,6 +294,7 @@ class WWPaceCalcV2View extends WatchUi.DataField {
             Pace = interp[d_index].ww_pace;
             return; 
         } else {
+            // Note: Timertime is never 0, so no check required.
             Pace = analyze(info.timerTime, info.elapsedDistance, info.totalAscent);
             return;
         }

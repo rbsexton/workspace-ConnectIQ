@@ -1,0 +1,23 @@
+<resources>
+    <string id="language">French</string>
+    <string id="AppName">RandoCalcV3</string>
+
+    <string id="late">Retard</string>
+
+    <string id="label">My Value</string>
+    <string id="methodTitle">Fermeture des contrôles</string>
+    <string id="ACP90">ACP90</string>
+    <string id="PBP90">PBP90</string>
+    <string id="PBP84">PBP84</string>
+    <string id="PBP80">PBP80</string>
+    <string id="Straight90">Straight90</string>
+    <string id="RUSA">RUSA</string>
+    <string id="LEL125">LEL128</string>
+
+    <string id="ui_verboseTitle">Format d'affichage</string>
+    <string id="ui_verbose_short">H:MM+</string>
+    <string id="ui_verbose_long">H:MM.M+</string>
+
+
+</resources>
+

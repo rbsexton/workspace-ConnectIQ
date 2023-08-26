@@ -1,0 +1,21 @@
+<strings>
+    <string id="AppName">RandoCalcV3</string>
+
+    <string id="label">My Value</string>
+    <string id="methodTitle">Control closing times.</string>
+    <string id="ACP90">ACP90</string>
+    <string id="PBP90">PBP90</string>
+    <string id="PBP84">PBP84</string>
+    <string id="PBP80">PBP80</string>
+    <string id="Straight90">Straight90</string>
+    <string id="RUSA">RUSA</string>
+    <string id="LEL125">LEL128</string>
+
+    <string id="ui_verboseTitle">Display more digits</string>
+    <string id="ui_verbose_short">Terse: H:MM+</string>
+    <string id="ui_verbose_long">Long: H:MM.M+</string>
+
+    <string id="language">English</string>
+    <string id="late">Late</string>
+
+</strings>

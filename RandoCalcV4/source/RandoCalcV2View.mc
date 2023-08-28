@@ -32,13 +32,15 @@ class RandoCalcV2View extends WatchUi.DataField {
     // up the time limits per ACP. 
     // For a 200k and 400k, you get additional time ( 10m and 20m, respectively )
     // The Calculator doesn't know what event you are riding.
+    // 
     const acp_90_lut = [
         [    0,     0 ],
-        [  200,  13.5 ],
-        [  300,  20.0 ],
-        [  400,  27.0 ],		
-        [  600,  40.0 ],		
-        [ 1000,  75.0 ],		
+        [  200,  13.5 ], // 200k in 13.5h 
+        [  300,  20.0 ], // 100k in  7.5h
+        [  400,  27.0 ], // 100k in    7h 		
+        [  600,  40.0 ], // 200k in   13h 		
+        [ 1000,  75.0 ], // 400k in   35h		
+        [ 1200,  90.0 ], // 200k in   15h
         [    0,     0 ] // Mark the end of the list.
     ];
 
@@ -148,7 +150,8 @@ class RandoCalcV2View extends WatchUi.DataField {
         [ 1300,  97.75000 ], //  97:45
         [ 1900, 158.33332 ], // 158:20		
         [ 2500, 300.00000 ], // 300:00 	
-        [    0,         0 ] 
+        [ 2700, 324.00000 ], // Over-run entry.  	
+        [    0,         0 ]  
         ];
 
     // -------------------------------------------------------------

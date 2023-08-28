@@ -6,7 +6,7 @@ import Toybox.Lang;
 
 class RandoCalcV2View extends WatchUi.DataField {
 
-    const do_simulate = 0;
+    const do_simulate = 1;
 
     // -------------------------------------------------------------------------
     // Look up tables.
@@ -142,7 +142,7 @@ class RandoCalcV2View extends WatchUi.DataField {
     // 1900-2499 10kph 
     // 2500+     200km/day 
     const rusa_lut = [
-        [       0,      0, 15.000000 ], 
+        [    0,         0, 15.000000 ], 
         [  700,  46.66667, 13.300000 ], //  46:40
         [ 1300,  97.75000, 12.000000 ], //  97:45
         [ 1900, 158.33332, 10.000000 ], // 158:20		
@@ -160,6 +160,7 @@ class RandoCalcV2View extends WatchUi.DataField {
         // [ 0, 0, 0.004934210526316 ], // 1520km in 125h
         // [ 0, 0, 0.00487012987013  ], // 1540km in 125h 
             [ 0, 0, 12.0000000000000  ], // 1540km in 128.333h = 12kph
+            [ 1540, 128.333, 0 ], // 300:00 	
             [ 0, 0, 0 ] 
         ];
 
@@ -172,6 +173,56 @@ class RandoCalcV2View extends WatchUi.DataField {
 
     // Displayable table names.
     const method_names = ["ACP90", "PBP90", "PBP84", "PBP80", "RM90" , "RUSA", "LEL128" ];
+
+    // -------------------------------------------------------------
+    // Support methods 
+    // -------------------------------------------------------------
+    function format_time(banked as Float, verbose_cutoff as float, verbose as Boolean) as String {
+        string formatted; 
+
+        // ---------------- Seconds ----------------
+        // XXs 
+        
+        if ( banked < 1.0 ) { // Seconds
+            var seconds = banked * 60.0f;
+            seconds = seconds.toNumber(); // Round to an integer.
+            formatted = seconds.format("%d") + "s";
+            return(formatted);
+            }
+        // ---------------- Up to 60 / 90 Minutes ----------------
+        // XXmSS
+        if ( banked < verbose_cutoff ) { // Minutes and seconds.
+            var m = banked.toNumber();
+            var s = ( banked - m ) * 60.0f;
+            s = s.toNumber();
+            
+            formatted = m.format("%d") + "m" + s.format("%02d");  	
+            return(formatted);
+            }
+
+        // ---------------- Beyond 60 or 90m ----------------------------
+        // The Math is the same for HmMM.M and HHmMM, so do it together.
+        var b_hours = banked * ( 0.0166666666666666666666666f ); // divide by 60
+        
+        var h = b_hours.toNumber();
+        var m = banked - (h * 60.0f); // back to minutes with fractional minutes.
+
+        // ---------------- Up to 10 Hours ----------------
+        // XhYY.Z 
+        if ( verbose && banked < 600.0 ) {
+            formatted = h.format("%d") + "h" +  m.format("%02.1f");  				
+            return(formatted);
+            }
+
+        // ---------------- Over 10 Hours ----------------
+        // XXhMM
+        // System.println("m +" + m);
+        m = m.toNumber();
+        formatted = h.format("%d") + "h" + m.format("%02d");
+        return(formatted);
+    }
+
+
 
     // -------------------------------------------------------------------------
     // Main Logic 
@@ -264,52 +315,7 @@ class RandoCalcV2View extends WatchUi.DataField {
         System.println("Started 0kph");
         }
 
-    // Generate a monotonic counter that triggers the different 
-    // display formats.   Do this with simulated distance. 
-    // 30 kph = 30000 m / 3600 s = 8.333 m/s
 
-    // General Plan:
-    // Start, 0 kph for 30s
-    // 30 kph for 30s 
-
-    const simspeed15 = 250.0;  // 15kph = 250 m/minute.
-
-    hidden var simulated_distance = 0.0;  // Meters 
-    hidden var simulated_speed    = 0.0;  // Meters/s
-    hidden var simulation_counter = 0;    // Minutes
-
-    function simulate() {
-
-        if ( do_simulate != 1 ) { return; } 
-
-        switch(simulation_counter) {
-            case 0:  // Count down from 0 to -10m
-                System.println("Sim 0 kph c = 0");
-                simulated_speed = 0.0;
-                break;  
-            case 10:  // Hold pretty steady 
-                System.println("Sim 15kph @ c = 15");
-                simulated_speed = simspeed15;
-                break;
-            case 30:  
-                System.println("Sim 60kph @ c = 30");
-                simulated_speed = simspeed15 * 4.0;
-                break;
-            case 90:
-                System.println("Sim 30kph @c = 90 Distance = 22.5km");
-                simulated_distance = simulated_distance + 1.445 * 15000;
-                break;
-            case 120:
-                System.println("Distance = 150km c = 240");
-                simulated_distance = simulated_distance + 8.38 * 15000;
-            default:
-                simulated_distance = simulated_distance + simulated_speed;
-        }
-
-        simulation_counter++;
-        System.print(".");
-    }
-                
     // ----------------------------------------------------------------------
     // ----------------------------------------------------------------------
     // ----------------------------------------------------------------------
@@ -441,13 +447,13 @@ class RandoCalcV2View extends WatchUi.DataField {
         if ( BankedTime < 0 ) {
             inthehole = true;
             banked = BankedTime.abs();
-            formatted = "-";
             }
         else {
             inthehole = false;
             banked = BankedTime;
-            formatted = "";
             }
+
+        formatted = format_time(banked, verbose_cutoff, verbose);
 
         // System.println(banked);
 
@@ -455,47 +461,6 @@ class RandoCalcV2View extends WatchUi.DataField {
         // Real world tests show that there are at most 4 usable digits  
         // on a 530, with 10 fields on the screen.
         
-        // ---------------- Seconds ----------------
-        // XXs 
-        
-        if ( banked < 1.0 ) { // Seconds
-            var seconds = banked * 60.0f;
-            seconds = seconds.toNumber(); // Round to an integer.
-            formatted = seconds.format("%d") + "s";
-            }
-        // ---------------- Up to 60 / 90 Minutes ----------------
-        // XXmSS
-        else if ( banked < verbose_cutoff ) { // Minutes and seconds.
-            var m = banked.toNumber();
-            var s = ( banked - m ) * 60.0f;
-            s = s.toNumber();
-            
-            formatted = m.format("%d") + "m" + s.format("%02d");  	
-            }
-
-        // ---------------- Beyond 60 or 90m ----------------------------
-        // The Math is the same for HmMM.M and HHmMM, so do it together.
-        else {
-            var b_hours = banked * ( 0.0166666666666666666666666f ); // divide by 60
-            
-            var h = b_hours.toNumber();
-            var m = banked - (h * 60.0f); // back to minutes with fractional minutes.
-
-            // ---------------- Up to 10 Hours ----------------
-            // XhYY.Z 
-            if ( verbose && banked < 600.0 ) {
-                formatted = h.format("%d") + "h" +  m.format("%02.1f");  				
-                }
-
-            // ---------------- Over 10 Hours ----------------
-            // XXhMM
-            else {			
-                // System.println("m +" + m);
-                m = m.toNumber();
-                formatted = h.format("%d") + "h" + m.format("%02d");  				
-                }
-            }
-
         // Add the trend indicator.
         formatted = formatted + trend_text;
                         
@@ -571,4 +536,56 @@ class RandoCalcV2View extends WatchUi.DataField {
         View.onUpdate(dc);
     }
 
+
+    // ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
+    // Simulation for display format verification.
+    // ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
+    // Generate a monotonic counter that triggers the different 
+    // display formats.   Do this with simulated distance. 
+    // 30 kph = 30000 m / 3600 s = 8.333 m/s
+
+    // General Plan:
+    // Start, 0 kph for 30s
+    // 30 kph for 30s 
+
+    const simspeed15 = 250.0;  // 15kph = 250 m/minute.
+
+    hidden var simulated_distance = 0.0;  // Meters 
+    hidden var simulated_speed    = 0.0;  // Meters/s
+    hidden var simulation_counter = 0;    // Minutes
+
+    function simulate() {
+
+        if ( do_simulate != 1 ) { return; } 
+
+        switch(simulation_counter) {
+            case 0:  // Count down from 0 to -10m
+                System.println("Sim 0 kph c = 0");
+                simulated_speed = 0.0;
+                break;  
+            case 10:  // Hold pretty steady 
+                System.println("Sim 15kph @ c = 15");
+                simulated_speed = simspeed15;
+                break;
+            case 30:  
+                System.println("Sim 60kph @ c = 30");
+                simulated_speed = simspeed15 * 4.0;
+                break;
+            case 90:
+                System.println("Sim 30kph @c = 90 Distance = 22.5km");
+                simulated_distance = simulated_distance + 1.445 * 15000;
+                break;
+            case 120:
+                System.println("Distance = 150km c = 240");
+                simulated_distance = simulated_distance + 8.38 * 15000;
+            default:
+                simulated_distance = simulated_distance + simulated_speed;
+        }
+
+        simulation_counter++;
+        System.print(".");
+    }
+    
 }

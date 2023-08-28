@@ -177,8 +177,8 @@ class RandoCalcV2View extends WatchUi.DataField {
     // -------------------------------------------------------------
     // Support methods 
     // -------------------------------------------------------------
-    function format_time(banked as Float, verbose_cutoff as float, verbose as Boolean) as String {
-        string formatted; 
+    function format_time(banked as Float, verbose_cutoff as Float, verbose as Boolean) as String {
+        var formatted; 
 
         // ---------------- Seconds ----------------
         // XXs 

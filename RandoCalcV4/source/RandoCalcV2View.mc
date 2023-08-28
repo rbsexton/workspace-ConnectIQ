@@ -201,8 +201,12 @@ class RandoCalcV2View extends WatchUi.DataField {
     function initialize() {
         DataField.initialize();
 
+        // Localization.
         _late_message = WatchUi.loadResource($.Rez.Strings.late) as String;
 
+        // ------------------------------------------
+        // Progress indicator.
+        // ------------------------------------------
         BankedTime        = 0.0f;
         PreviousBanked    = 0.0f;
         table_entry       = 0;
@@ -214,11 +218,16 @@ class RandoCalcV2View extends WatchUi.DataField {
         trend_i           = 0;
         trend_text        = "";
 
+        // ------------------------------------------
+        // Display Format/Verbosity.
+        // ------------------------------------------
         verbose           = Application.Properties.getValue("ui_verbose");
         if ( verbose ) { verbose_cutoff = 90.0; }
         else           { verbose_cutoff = 60.0; } 
 
+        // ------------------------------------------
         // Choose the look-up table. 
+        // ------------------------------------------
         which_flavor      = Application.Properties.getValue("method");
         method_name       = method_names[which_flavor];     
 
@@ -235,6 +244,9 @@ class RandoCalcV2View extends WatchUi.DataField {
 
             lut[i][0] = base_lut[i][0] * 1000.0;          // km to meters.  API Uses floats.
             lut[i][1] = base_lut[i][1] * 60.0;            // Hours to minutes.
+
+            // Calculate the expected speed in minutes/meter.
+            // Its the length of this leg divided by the minutes a
             if ( base_lut[i][2] != 0 ) {
                 lut[i][2] = (60.0 / base_lut[i][2]) / 1000.0; // kph to minutes/meter 
             } else {
@@ -243,6 +255,9 @@ class RandoCalcV2View extends WatchUi.DataField {
 
         }
 
+        // ------------------------------------------
+        // Simulation Init.
+        // ------------------------------------------
         simulated_distance = 0.0;
         simulation_counter  = 0;
 

@@ -6,7 +6,7 @@ import Toybox.Lang;
 
 class RandoCalcV2View extends WatchUi.DataField {
 
-    const do_simulate = 1;
+    const do_simulate = 0;
 
     // -------------------------------------------------------------------------
     // Look up tables.

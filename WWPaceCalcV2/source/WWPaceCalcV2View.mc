@@ -56,6 +56,7 @@ function analyze( timerTime as Number, elapsedDistance as Float, totalAscent as 
 // get the math right regardless of the service interval.
 //   
 // Keep pdp_count Primary data Points
+// ------------------------------------------------------------------
 // ---------------------------------------------------------------
 // ---------------------------------------------------------------
 // ---------------------------------------------------------------
@@ -73,8 +74,7 @@ class MovingAverage {
 	// The timeout determines the baseline sampling rate.
     // -----------------------------------
     var   timebase_interval_ms as Number;  
-	var   timebase_err         as Number; // The countdown variable.
-	var   timebase_last_ms     as Number; // Used to generate the delta. 
+    var   timebase_err         as Number; // The countdown variable.
 
     (:typecheck(false))
     function initialize(sample_interval_minutes as Number) {
@@ -90,7 +90,6 @@ class MovingAverage {
 
         // Calculate the update interface for the main timing loop.  
         // there are 64 samples.
-        timebase_last_ms = 0; 
         timebase_interval_ms = ( sample_interval_minutes * 60 ) / pdp_count;  
         timebase_interval_ms *= 1000;
 
@@ -103,11 +102,9 @@ class MovingAverage {
 
     // Update the running timebase/iterpolator. 
     // return a 1 if its time to add a new sample.
-    function interpolate(now as Number) as Boolean {
-        var duration = now - timebase_last_ms;
-        timebase_last_ms = now;
-
-        timebase_err -= duration; // Use Bresenhams Algorithm.
+    function interpolate(delta as Number) as Boolean {
+ 
+        timebase_err -= delta; // Use Bresenhams Algorithm.
 
         if ( timebase_err  <= 0 ) {
             timebase_err += timebase_interval_ms;
@@ -122,25 +119,25 @@ class MovingAverage {
     // When this is complete, pdp_sample_i points at the oldest 
     // data point, and pdp_sample_i-1 points to the newest.
     (:typecheck(false))
-    function add_sample(tTime as Number, eDistance as Float, totAscent as Float) as Void {
+    function add_sample(info as Activity.Info) as Void {
         var i = pdp_sample_i & pdp_mask;
 
-        data_timerTime      [i] = tTime;  
-        data_elapsedDistance[i] = eDistance;
-        data_totalAscent    [i] = totAscent;
+        data_timerTime      [i] = info.timerTime;  
+        data_elapsedDistance[i] = info.elapsedDistance;
+        data_totalAscent    [i] = info.totalAscent;
 
         pdp_sample_i++;
     }
 
     // Call this every time.  If something changes, update wwpace.
     (:typecheck(false))
-    function service(now as Number, tTime as Number, eDistance as Float, totAscent as Float) as Void
+    function service(delta as Number, info as Activity.Info) as Void
     {
-        if ( !self.interpolate(now) ) {
+        if ( !self.interpolate(delta) ) {
             return;
         }
                 
-        self.add_sample(tTime, eDistance, totAscent);
+        self.add_sample(info);
 
         // Make sure that there is enough data.
         if ( pdp_sample_i < pdp_count ) {
@@ -161,6 +158,10 @@ class MovingAverage {
     }
 } // class MovingAverages
 
+// ------------------------------------------------------------------
+// ------------------------------------------------------------------
+// ------------------------------------------------------------------
+// ------------------------------------------------------------------
 class WWPaceCalcV2View extends WatchUi.DataField {
 
     var Pace; // This gets displayed.
@@ -176,6 +177,11 @@ class WWPaceCalcV2View extends WatchUi.DataField {
 
     var   d_index     = 0;  // Zero means 'Whole Ride'  Matches the labels.
     const d_index_max = 5;
+
+    // ------------------------------------
+    // Capture data based upon deltas, so keep a little state. 
+    // ------------------------------------
+    var   last_pdp_ms = 0 as Number; 
 
     (:typecheck(false))
     function initialize() {
@@ -226,41 +232,35 @@ class WWPaceCalcV2View extends WatchUi.DataField {
 
         next_display();
 
-        // The interpolator has to run at all times, or 
+        // The interpolator has to run at all times.  , or 
         // it will get stuck and never recover. 
         // var now  = System.getTimer(); // This is free-running since device start.
-        var now  = info.elapsedTime; // This is 0 until you start.
+        var now  = info.timerTime; // This is 0 until you start.
 
         // All hell breaks loose when now = 0, because divide by zero.
-        if ( now == 0 ) { Pace = 0.0; return; }
 
         // Check for unstarted ride and return 0. 
-        if (info.totalAscent     == null ||
-            info.elapsedDistance == null ||
-            info.averageSpeed    == null ) {
-            System.println("compute() - nulls");
-    
-            interp[1].service(now, info.timerTime, 0, 0);
-            interp[2].service(now, info.timerTime, 0, 0);
-            interp[3].service(now, info.timerTime, 0, 0);
-            interp[4].service(now, info.timerTime, 0, 0);
-            interp[5].service(now, info.timerTime, 0, 0);
+        if ( now == 0 ) { Pace = 0.0; return; }
 
-            Pace = 0.0;
-        	return;			        
-			}             
+        var delta = now - last_pdp_ms;
+        last_pdp_ms = now; 
+
+        // Older versions had checks for nulls.   
+        // Assume that if time is advancing that all of these 
+        // input data items have real values. 
 
         // Otherwise, normalcy.    Feed the interpolators timertime.
-        interp[1].service(now, info.timerTime, info.elapsedDistance, info.totalAscent);
-        interp[2].service(now, info.timerTime, info.elapsedDistance, info.totalAscent);
-        interp[3].service(now, info.timerTime, info.elapsedDistance, info.totalAscent);
-        interp[4].service(now, info.timerTime, info.elapsedDistance, info.totalAscent);
-        interp[5].service(now, info.timerTime, info.elapsedDistance, info.totalAscent);
+        interp[1].service(delta, info); // 1h
+        interp[2].service(delta, info); // 2h
+        interp[3].service(delta, info); // 4h
+        interp[4].service(delta, info); // 8h 
+        interp[5].service(delta, info); // 24h
 
         // The math can produce crazy results when you don't 
         // have enough data, so don't calculate that.
 
-        // If its too soon to collect useful data, return. 
+        // The math can produce odd results at the beginning of the 
+        // ride, so don't even display until 500m of distance. 
         if ( info.elapsedDistance < 500 ) { 
             // System.println("compute() - too soon");
             System.println("compute() - too soon ");

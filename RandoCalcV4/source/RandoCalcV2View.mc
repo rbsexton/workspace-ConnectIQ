@@ -12,17 +12,30 @@ class RandoCalcV2View extends WatchUi.DataField {
     // Look up tables.
     // -------------------------------------------------------------------------
 
-    // Distance (km), Hours Offset, kph for this leg.
+    // Distance (km), Hours Offset
     //
     // The internal units are meters, minutes, and minutes/meter.
     // the first step is converting from human friendly units to something 
     // that works better for calculation. 
 
-    // a bit unwieldy when the natural unit for the end user is 
-    // minutes, so the first step is conversion to minutes. 
+    // These tables are copied to make the internal lookup table. 
+    // 
+    // That table contains:
+    // starting km for this leg 
+    // time limit for this leg. 
+    // minimum speed during this leg, in minutes/meter. 
+    // minimum speed during this leg in kph. 
+    
     // This is an embedded device, so its better to do any complex math 
     // up front rather than in real time. 
-    //
+ 
+    // There is an assumption that the last leg has the same minimum 
+    // speed as the second-to last leg.   Thats not true in some 
+    // cases, such as kms 1000-1200, where the pace actually picks 
+    // up after the more relaxed time requirements.  
+    // in that case, add another entry that has the required speed. 
+
+
 
     // -------------------------------------------------------------
     // ACP Qualifiers
@@ -33,6 +46,8 @@ class RandoCalcV2View extends WatchUi.DataField {
     // For a 200k and 400k, you get additional time ( 10m and 20m, respectively )
     // The Calculator doesn't know what event you are riding.
     // 
+    // There is no such thing as an ACP-sanctioned 1200, but define it 
+    // so that the required minimum speed goes back up when you hit 1000km.
     const acp_90_lut = [
         [    0,     0 ],
         [  200,  13.5 ], // 200k in 13.5h 

@@ -164,7 +164,7 @@ class MovingAverage {
 // ------------------------------------------------------------------
 class WWPaceCalcV2View extends WatchUi.DataField {
 
-    var Pace; // This gets displayed.
+    var Pace as Float = 0.0; // This gets displayed.
 
     var         interp = new Array<MovingAverage>[6];
     const method_names = ["WWPace", "Pace 1H", "Pace 2H", "Pace 4H", "Pace 8H", "24H"];

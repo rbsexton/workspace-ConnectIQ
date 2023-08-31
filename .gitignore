@@ -58,3 +58,5 @@ sideload
 *.prg
 */bin
 */.vscode
+# Ignore .fit files
+*.fit

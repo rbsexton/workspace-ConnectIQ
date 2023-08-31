@@ -1,6 +1,6 @@
 <resources>
     <string id="language">Spanish</string>
-    <string id="AppName">RandoCalcV3</string>
+    <string id="AppName">RandoCalcV4</string>
     <string id="late">Tarde</string>
 
     <string id="label">My Value</string>

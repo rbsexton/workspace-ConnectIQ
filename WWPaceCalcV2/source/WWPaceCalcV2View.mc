@@ -241,20 +241,6 @@ class WWPaceCalcV2View extends WatchUi.DataField {
         // Check for unstarted ride and return 0. 
         if ( now == 0 ) { Pace = 0.0; return; }
 
-        var delta = now - last_pdp_ms;
-        last_pdp_ms = now; 
-
-        // Older versions had checks for nulls.   
-        // Assume that if time is advancing that all of these 
-        // input data items have real values. 
-
-        // Otherwise, normalcy.    Feed the interpolators timertime.
-        interp[1].service(delta, info); // 1h
-        interp[2].service(delta, info); // 2h
-        interp[3].service(delta, info); // 4h
-        interp[4].service(delta, info); // 8h 
-        interp[5].service(delta, info); // 24h
-
         // The math can produce crazy results when you don't 
         // have enough data, so don't calculate that.
 
@@ -267,6 +253,20 @@ class WWPaceCalcV2View extends WatchUi.DataField {
             Pace = 0.0;
             return;
             }
+
+        // Older versions had checks for nulls.   
+        // Assume that if time is advancing that all of these 
+        // input data items have real values. 
+
+        var delta = now - last_pdp_ms;
+        last_pdp_ms = now; 
+
+        // Otherwise, normalcy.    Feed the interpolators timertime.
+        interp[1].service(delta, info); // 1h
+        interp[2].service(delta, info); // 2h
+        interp[3].service(delta, info); // 4h
+        interp[4].service(delta, info); // 8h 
+        interp[5].service(delta, info); // 24h
 
         // Select the data to display, based upon the current display_index.
         // Index 0 is reserved for 'Whole Ride'

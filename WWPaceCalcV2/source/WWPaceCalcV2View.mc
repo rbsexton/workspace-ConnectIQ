@@ -63,9 +63,9 @@ function analyze( timerTime as Number, elapsedDistance as Float, totalAscent as 
 class MovingAverage {
     var pdp_sample_i as Number = 0;    // This points to the next value to write. 
 
-    var data_timerTime       = new Array<Number>[pdp_count];
-    var data_elapsedDistance = new Array<Float>[pdp_count];
-    var data_totalAscent     = new Array<Float>[pdp_count];
+    var data_timerTime       as Array<Number> = new Array<Number>[pdp_count];
+    var data_elapsedDistance as Array<Float>  = new Array<Float>[pdp_count];
+    var data_totalAscent     as Array<Float>  = new Array<Float>[pdp_count];
     
     var ww_pace as Float = 0.0;
 
@@ -76,7 +76,6 @@ class MovingAverage {
     var   timebase_interval_ms as Number;  
     var   timebase_err         as Number; // The countdown variable.
 
-    (:typecheck(false))
     function initialize(sample_interval_minutes as Number) {
 
         // Initialize the buffers so that the calculation 
@@ -118,19 +117,19 @@ class MovingAverage {
     // Add a sample and return the new pace information.
     // When this is complete, pdp_sample_i points at the oldest 
     // data point, and pdp_sample_i-1 points to the newest.
-    (:typecheck(false))
     function add_sample(info as Activity.Info) as Void {
         var i = pdp_sample_i & pdp_mask;
 
         data_timerTime      [i] = info.timerTime;  
         data_elapsedDistance[i] = info.elapsedDistance;
-        data_totalAscent    [i] = info.totalAscent;
+
+        // Still not sure why this 'as Float' is necessary. 
+        data_totalAscent    [i] = info.totalAscent as Float;
 
         pdp_sample_i++;
     }
 
     // Call this every time.  If something changes, update wwpace.
-    (:typecheck(false))
     function service(delta as Number, info as Activity.Info) as Void
     {
         if ( !self.interpolate(delta) ) {
@@ -260,8 +259,9 @@ class WWPaceCalcV2View extends WatchUi.DataField {
         // have enough data, so don't calculate that.
 
         // The math can produce odd results at the beginning of the 
-        // ride, so don't even display until 500m of distance. 
-        if ( info.elapsedDistance < 500 ) { 
+        // ride, so don't even display until 500m of distance.
+
+        if ( info.elapsedDistance == null || info.elapsedDistance < 500 ) { 
             // System.println("compute() - too soon");
             System.println("compute() - too soon ");
             Pace = 0.0;

@@ -1,10 +1,10 @@
-using Toybox.WatchUi;
-using Toybox.Application;
-using Toybox.Graphics;
+import Toybox.Application;
+import Toybox.Graphics;
+import Toybox.WatchUi;
 
 class Background extends WatchUi.Drawable {
 
-    hidden var mColor;
+    hidden var mColor as ColorValue;
 
     function initialize() {
         var dictionary = {
@@ -12,13 +12,15 @@ class Background extends WatchUi.Drawable {
         };
 
         Drawable.initialize(dictionary);
+
+        mColor = Graphics.COLOR_WHITE;
     }
 
-    function setColor(color) {
+    function setColor(color as ColorValue) as Void {
         mColor = color;
     }
 
-    function draw(dc) {
+    function draw(dc as Dc) as Void {
         dc.setColor(Graphics.COLOR_TRANSPARENT, mColor);
         dc.clear();
     }

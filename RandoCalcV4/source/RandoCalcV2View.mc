@@ -1,8 +1,7 @@
-using Toybox.WatchUi;
-using Toybox.Graphics;
-using Toybox.Application;
-
+import Toybox.Activity;
+import Toybox.Graphics;
 import Toybox.Lang;
+import Toybox.WatchUi;
 
 class RandoCalcV2View extends WatchUi.DataField {
 
@@ -188,7 +187,7 @@ class RandoCalcV2View extends WatchUi.DataField {
     // -------------------------------------------------------------
 
     // These lists will be indexed by the user config settings.
-    const luts = [acp_90_lut, pbp_90_lut, pbp_84_lut, pbp_80_lut, straight_90_lut , rusa_lut, lel125_lut ];
+    const luts as Array = [acp_90_lut, pbp_90_lut, pbp_84_lut, pbp_80_lut, straight_90_lut , rusa_lut, lel125_lut ];
 
     // Displayable table names.
     const method_names = ["ACP90", "PBP90", "PBP84", "PBP80", "RM90" , "RUSA", "LEL128" ];
@@ -247,23 +246,22 @@ class RandoCalcV2View extends WatchUi.DataField {
     // Main Logic 
     // -------------------------------------------------------------------------
 
-    hidden var BankedTime; // Final calulated value.
-    hidden var mValueLast; //
-    hidden var PreviousBanked;
+    hidden var BankedTime     as Float; // Final calulated value.
+    hidden var PreviousBanked as Float;
         
-    hidden var table_entry;
+    hidden var table_entry    as Number;
 
     hidden var which_flavor;
-    var        method_name;
+    var        method_name    as Text;
 
-    hidden var verbose; 
-    hidden var verbose_cutoff;
+    hidden var verbose         as Boolean; 
+    hidden var verbose_cutoff  as Float ;
 
-    var        lut as Array;
+    var        lut as Array<Array>;
 
     var        trend_data_banked as Array<Float> = new[31];
-    hidden var trend_i;
-    hidden var trend_text;
+    hidden var trend_i     as Number;
+    hidden var trend_text  as String;
 
     private var _late_message as String;
 
@@ -301,7 +299,7 @@ class RandoCalcV2View extends WatchUi.DataField {
         which_flavor      = Application.Properties.getValue("method");
         method_name       = method_names[which_flavor];     
 
-        var base_lut      = luts[which_flavor];
+        var base_lut      = luts[which_flavor] as Array<Array>;
         var base_lut_len  = luts[which_flavor].size();
 
         // From the web example.
@@ -312,7 +310,7 @@ class RandoCalcV2View extends WatchUi.DataField {
         // NOTE! This code looks at 'next', and counts upon their 
         // being an over-run/mark the end entry.   
         for( var i = 0; i < (base_lut_len-1); i += 1 ) {
-            lut[i] = new [ 4 ];
+            lut[i] = new Array<Float>[ 4 ];
 
             lut[i][0] = base_lut[i][0] * 1000.0;          // km to meters.  API Uses floats.
             lut[i][1] = base_lut[i][1] * 60.0;            // Hours to minutes.
@@ -360,7 +358,7 @@ class RandoCalcV2View extends WatchUi.DataField {
     // ----------------------------------------------------------------------
     // ----------------------------------------------------------------------
     // ----------------------------------------------------------------------
-    function compute(info) {
+    function compute(info) as Void {
 
         var distance;
         if ( do_simulate ) {
@@ -592,11 +590,11 @@ class RandoCalcV2View extends WatchUi.DataField {
 
     const simspeed15 = 250.0;  // 15kph = 250 m/minute.
 
-    hidden var simulated_distance = 0.0;  // Meters 
-    hidden var simulated_speed    = 0.0;  // Meters/s
-    hidden var simulation_counter = 0;    // Minutes
+    hidden var simulated_distance as Float  = 0.0;  // Meters 
+    hidden var simulated_speed    as Float  = 0.0;  // Meters/s
+    hidden var simulation_counter as Number = 0;    // Minutes
 
-    function simulate() {
+    function simulate() as Void {
 
         if ( do_simulate != 1 ) { return; } 
 

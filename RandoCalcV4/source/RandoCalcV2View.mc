@@ -530,43 +530,30 @@ class RandoCalcV2View extends WatchUi.DataField {
             valueView.locY = valueView.locY + 7;
         }
 
+        var paint_white = ( getBackgroundColor() == Graphics.COLOR_WHITE );
+
+        // If in the hole, flip it... 
         if ( inthehole ) {
-            if ( getBackgroundColor() == Graphics.COLOR_BLACK ) {
-                View.findDrawableById("Background").setColor(Graphics.COLOR_WHITE);
-                
-                View.findDrawableById("label").setColor(Graphics.COLOR_BLACK);	
-                View.findDrawableById("value").setColor(Graphics.COLOR_BLACK);
-                }
-            else {
-                View.findDrawableById("Background").setColor(Graphics.COLOR_BLACK);
+            if ( paint_white ) { paint_white = false; } 
+            else               { paint_white = true ; }
+        }
 
-                View.findDrawableById("label").setColor(Graphics.COLOR_WHITE);
-                View.findDrawableById("value").setColor(Graphics.COLOR_WHITE); 			
-                }
+        if ( paint_white ) {
+            View.findDrawableById("Background").setColor(Graphics.COLOR_WHITE);            
+            View.findDrawableById("label").setColor(Graphics.COLOR_BLACK);	
+            View.findDrawableById("value").setColor(Graphics.COLOR_BLACK);
+        } else {
+            View.findDrawableById("Background").setColor(Graphics.COLOR_BLACK);
+            View.findDrawableById("label").setColor(Graphics.COLOR_WHITE);
+            View.findDrawableById("value").setColor(Graphics.COLOR_WHITE); 			
+        }
 
-            // August 2023- Make a shorter label for watches.
-            // View.findDrawableById("label").setText("Late " + method_name);
-            View.findDrawableById("label").setText(_late_message);
-            }
-        else { 
-            if ( getBackgroundColor() == Graphics.COLOR_BLACK ) {
-                View.findDrawableById("Background").setColor(Graphics.COLOR_BLACK);
-                
-                View.findDrawableById("label").setColor(Graphics.COLOR_WHITE);
-                View.findDrawableById("value").setColor(Graphics.COLOR_WHITE); 			
-                }
-            else {
-                View.findDrawableById("Background").setColor(Graphics.COLOR_WHITE);
-                
-                View.findDrawableById("label").setColor(Graphics.COLOR_BLACK);			
-                View.findDrawableById("value").setColor(Graphics.COLOR_BLACK);
-                }
-            
-            // V3, August 2023 - A more concise label for use with watches. 
-            // View.findDrawableById("label").setText("Banked " + method_name);
-            View.findDrawableById("label").setText(method_name);
-            }   
+        // August 2023- Make a shorter labels for watches.
+        // View.findDrawableById("label").setText("Late " + method_name);
 
+        if ( inthehole )  { View.findDrawableById("label").setText(_late_message); }
+        else              { View.findDrawableById("label").setText(method_name);   }
+ 
         View.findDrawableById("value").setText(formatted);
 
         // Call parent's onUpdate(dc) to redraw the layout

@@ -431,9 +431,10 @@ class RandoCalcV2View extends WatchUi.DataField {
     }
  
     // --------------------------------------------------------------
+    // --------------------------------------------------------------
     // Layout  
     // --------------------------------------------------------------
-            
+    // --------------------------------------------------------------            
     // Set your layout here. Anytime the size of obscurity of
     // the draw context is changed this will be called.
     function onLayout(dc) {
@@ -470,11 +471,15 @@ class RandoCalcV2View extends WatchUi.DataField {
         return;
     }
 
-    // Display the value you computed here. This will be called
+    // -------------------------------------------------------------------
+    // -------------------------------------------------------------------
+    // This will be called
     // once a second when the data field is visible.
     // Make a local copy of the Calculated value because the 
     // two routines run asyncronously.   This is probably not a hazard,
     // but better to be safe.
+    // -------------------------------------------------------------------
+    // -------------------------------------------------------------------
     function onUpdate(dc) {
 
         var inthehole; 
@@ -492,12 +497,6 @@ class RandoCalcV2View extends WatchUi.DataField {
             }
 
         formatted = format_time(banked, verbose_cutoff, verbose);
-
-        // System.println(banked);
-
-        // Format it according to magnitude.
-        // Real world tests show that there are at most 4 usable digits  
-        // on a 530, with 10 fields on the screen.
         
         // Add the trend indicator.
         formatted = formatted + trend_text;

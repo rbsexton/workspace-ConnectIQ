@@ -533,10 +533,7 @@ class RandoCalcV2View extends WatchUi.DataField {
         var paint_white = ( getBackgroundColor() == Graphics.COLOR_WHITE );
 
         // If in the hole, flip it... 
-        if ( inthehole ) {
-            if ( paint_white ) { paint_white = false; } 
-            else               { paint_white = true ; }
-        }
+        if ( inthehole ) { paint_white = !paint_white; } 
 
         if ( paint_white ) {
             View.findDrawableById("Background").setColor(Graphics.COLOR_WHITE);            

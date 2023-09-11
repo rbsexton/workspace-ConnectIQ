@@ -95,6 +95,11 @@ class MovingAverage {
         timebase_err         = timebase_interval_ms / 2; 
     }
 
+    // This one is subtle.   After we add a sample,
+    // pdp_sample_i will be the oldest sample. 
+    // but there is an off by one thing here, as 
+    // _i 64 will = 0, so this will be legit as soon 
+    // as _i >= pdp_count 
     function interp_ready() as Boolean {
         return ( pdp_sample_i >= pdp_count );
     }
@@ -171,11 +176,13 @@ class WWPaceCalcV2View extends WatchUi.DataField {
     // ------------------------------------
     // Display Logic.
 
-    var   d_cycle      as Number = 15; // Count this down to cycle the field. 
-    const d_cycle_init as Number = 15; // Reset Value. 
+    hidden var   d_cycle      as Number = 15; // Count this down to cycle the field. 
+    hidden const d_cycle_init as Number = 15; // Reset Value. 
 
-    var   d_index      as Number = 0;  // Zero means 'Whole Ride'  Matches the labels.
-    const d_index_max  as Number = 5;
+    hidden var   d_index      as Number = 0;  // Zero means 'Whole Ride'  Matches the labels.
+    hidden const d_index_max  as Number = 5;
+
+    hidden var   d_invert     as Boolean = false; // Use this to tip off the user.
 
     // ------------------------------------
     // Capture data based upon deltas, so keep a little state. 
@@ -254,7 +261,6 @@ class WWPaceCalcV2View extends WatchUi.DataField {
             return;
             }
 
-        // Older versions had checks for nulls.   
         // Assume that if time is advancing that all of these 
         // input data items have real values. 
 
@@ -271,14 +277,13 @@ class WWPaceCalcV2View extends WatchUi.DataField {
         // Select the data to display, based upon the current display_index.
         // Index 0 is reserved for 'Whole Ride'
         if ( d_index == 0 ) {
-            // Note: Timertime is never 0, so no check required.
+            // Note: Timertime is never 0, so no additional check required
             Pace = analyze(info.timerTime, info.elapsedDistance, info.totalAscent);
             return;
         } else {
             Pace = interp[d_index].ww_pace;
             return; 
         }
-
     }
 
     // Display the value you computed here. This will be called

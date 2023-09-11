@@ -145,7 +145,6 @@ class MovingAverage {
 
         // Make sure that there is enough data.
         if ( pdp_sample_i < pdp_count ) {
-            ww_pace = 0.0;
             return; 
         }
 
@@ -226,6 +225,13 @@ class WWPaceCalcV2View extends WatchUi.DataField {
             d_index = 0; 
             }
 
+        // If the first interpolator is valid, its time to start
+        // alternating the display between normal and inverted
+        // every time we change display modes.
+        if ( interp[1].interp_ready() ) {
+            d_invert = !d_invert;
+        }
+
         // self.label = method_names[d_index];
     }
 
@@ -246,18 +252,19 @@ class WWPaceCalcV2View extends WatchUi.DataField {
         // All hell breaks loose when now = 0, because divide by zero.
 
         // Check for unstarted ride and return 0. 
-        if ( now == 0 ) { Pace = 0.0; return; }
-
-        // The math can produce crazy results when you don't 
-        // have enough data, so don't calculate that.
+        if ( now == 0 ) { return; }
 
         // The math can produce odd results at the beginning of the 
-        // ride, so don't even display until 500m of distance.
+        // ride, so don't even display until 500m of distance.  
+        var dist = info.elapsedDistance;
+        if ( dist == null ) { 
+            System.println("compute() - too soon (null) ");
+            return;
+            }
 
-        if ( info.elapsedDistance == null || info.elapsedDistance < 500 ) { 
-            // System.println("compute() - too soon");
-            System.println("compute() - too soon ");
-            Pace = 0.0;
+        if ( dist < 500 ) { 
+            var message = "compute() - too soon " + dist.format("%.1f");
+            System.println(message);
             return;
             }
 
@@ -289,20 +296,31 @@ class WWPaceCalcV2View extends WatchUi.DataField {
     // Display the value you computed here. This will be called
     // once a second when the data field is visible.
     function onUpdate(dc as Dc) as Void {
-        // Set the background color
-        (View.findDrawableById("Background") as Text).setColor(getBackgroundColor());
 
-        // Set the foreground color and value
+        // Look up the relevant objects.
         var value = View.findDrawableById("value") as Text;
-        if (getBackgroundColor() == Graphics.COLOR_BLACK) {
-            value.setColor(Graphics.COLOR_WHITE);
+        var label = View.findDrawableById("label") as Text;
+        var bg    = findDrawableById("Background") as Text;
+
+        // var paint_white = ( getBackgroundColor() == Graphics.COLOR_WHITE );
+
+        if ( d_invert ) {
+            bg.setColor(Graphics.COLOR_BLACK);
+            label.setColor(Graphics.COLOR_WHITE);
+            value.setColor(Graphics.COLOR_WHITE); 			
         } else {
+            bg.setColor(Graphics.COLOR_WHITE);            
+            label.setColor(Graphics.COLOR_BLACK);	
             value.setColor(Graphics.COLOR_BLACK);
         }
-        value.setText(Pace.format("%2.2f"));
 
-        (View.findDrawableById("label") as Text).setText(method_names[d_index]);
-
+        label.setText(method_names[d_index]);
+        if ( Pace > 0.0 ) {
+            value.setText(Pace.format("%2.2f"));
+        } else {
+            value.setText("-Wait-");
+        }
+ 
         // Call parent's onUpdate(dc) to redraw the layout
         View.onUpdate(dc);
     }
@@ -337,8 +355,7 @@ class WWPaceCalcV2View extends WatchUi.DataField {
             valueView.locY = valueView.locY + 7;
         }
 
-        // (View.findDrawableById("label") as Text).setText(Rez.Strings.label);
-        (View.findDrawableById("label") as Text).setText(method_names[d_index]);
+        // The Label changes, so update it elsewhere.
 
     }
 

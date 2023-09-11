@@ -165,17 +165,17 @@ class WWPaceCalcV2View extends WatchUi.DataField {
 
     var Pace as Float = 0.0; // This gets displayed.
 
-    var         interp = new Array<MovingAverage>[6];
+    var interp as Array<MovingAverage> = new Array<MovingAverage>[6];
     const method_names = ["WWPace", "Pace 1H", "Pace 2H", "Pace 4H", "Pace 8H", "24H"];
 
     // ------------------------------------
     // Display Logic.
 
-    var   d_cycle      = 15; // Count this down to cycle the field. 
-    const d_cycle_init = 15; // Reset Value. 
+    var   d_cycle      as Number = 15; // Count this down to cycle the field. 
+    const d_cycle_init as Number = 15; // Reset Value. 
 
-    var   d_index     = 0;  // Zero means 'Whole Ride'  Matches the labels.
-    const d_index_max = 5;
+    var   d_index      as Number = 0;  // Zero means 'Whole Ride'  Matches the labels.
+    const d_index_max  as Number = 5;
 
     // ------------------------------------
     // Capture data based upon deltas, so keep a little state. 

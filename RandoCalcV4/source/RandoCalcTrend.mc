@@ -1,5 +1,6 @@
 import Toybox.Lang;
 
+import Toybox.Test;
 
 class RandoCalcTrend
 {
@@ -35,4 +36,34 @@ class RandoCalcTrend
         else                { trend_i = 0; }
     }
 
+
+
+
+
 }
+
+(:test)
+function UnitTestNotMoving(logger as Logger) as Boolean {
+    var trend = new RandoCalcTrend();
+
+    for( var i = 0; i < 40; i++ ) {
+       trend.update(60.0);
+    }
+
+    logger.debug("UnitTestNotMoving.  trend_text =" + trend.trend_text );
+
+    return(trend.trend_text.equals("") );
+}
+
+(:test)
+function UnitTestMoving(logger as Logger) as Boolean {
+    var trend = new RandoCalcTrend();
+
+    for( var i = 0; i < 40 ; i++ ) {
+       trend.update(60.0+ 1.0 * i);
+    }
+
+    logger.debug("UnitTestMoving.  trend_text =" + trend.trend_text );
+    return( trend.trend_text.equals("+") );
+}
+

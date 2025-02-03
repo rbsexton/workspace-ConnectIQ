@@ -34,8 +34,6 @@ class RandoCalcV2View extends WatchUi.DataField {
     // up after the more relaxed time requirements.  
     // in that case, add another entry that has the required speed. 
 
-
-
     // -------------------------------------------------------------
     // ACP Qualifiers
     // -------------------------------------------------------------
@@ -415,10 +413,10 @@ class RandoCalcV2View extends WatchUi.DataField {
             // System.print  ("tBanked " + trend_banked + ");
 
             if ( trend_banked > 0 ) {
-                trend_text = "+";
+                trend_text = "!";
                 }
             else { 
-                trend_text = " ";
+                trend_text = "";
                 }
 
             trend_data_banked[trend_i]  = BankedTime;
@@ -535,23 +533,27 @@ class RandoCalcV2View extends WatchUi.DataField {
         // If in the hole, flip it... 
         if ( inthehole ) { paint_white = !paint_white; } 
 
+        var label = View.findDrawableById("label") as Text;
+        var value = View.findDrawableById("value") as Text;
+        var bg    = View.findDrawableById("Background") as Text;
+
         if ( paint_white ) {
-            View.findDrawableById("Background").setColor(Graphics.COLOR_WHITE);            
-            View.findDrawableById("label").setColor(Graphics.COLOR_BLACK);	
-            View.findDrawableById("value").setColor(Graphics.COLOR_BLACK);
+            bg.setColor(Graphics.COLOR_WHITE);            
+            label.setColor(Graphics.COLOR_BLACK);	
+            value.setColor(Graphics.COLOR_BLACK);
         } else {
-            View.findDrawableById("Background").setColor(Graphics.COLOR_BLACK);
-            View.findDrawableById("label").setColor(Graphics.COLOR_WHITE);
-            View.findDrawableById("value").setColor(Graphics.COLOR_WHITE); 			
+            bg.setColor(Graphics.COLOR_BLACK);
+            label.setColor(Graphics.COLOR_WHITE);
+            value.setColor(Graphics.COLOR_WHITE); 			
         }
 
         // August 2023- Make a shorter labels for watches.
         // View.findDrawableById("label").setText("Late " + method_name);
 
-        if ( inthehole )  { View.findDrawableById("label").setText(_late_message); }
-        else              { View.findDrawableById("label").setText(method_name);   }
+        if ( inthehole )  { label.setText(_late_message); }
+        else              { label.setText(method_name);   }
  
-        View.findDrawableById("value").setText(formatted);
+        value.setText(formatted);
 
         // Call parent's onUpdate(dc) to redraw the layout
         View.onUpdate(dc);

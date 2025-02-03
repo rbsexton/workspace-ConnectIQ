@@ -257,15 +257,15 @@ class RandoCalcV2View extends WatchUi.DataField {
 
     var        lut as Array<Array>;
 
-    var        trend_data_banked as Array<Float> = new[31];
-    hidden var trend_i     as Number;
-    hidden var trend_text  as String;
+    private var trend as RandoCalcTrend; 
 
     private var _late_message as String;
 
     // Set the label of the data field here.
     function initialize() {
         DataField.initialize();
+
+        trend = new RandoCalcTrend();
 
         // Localization.
         _late_message = WatchUi.loadResource($.Rez.Strings.late) as String;
@@ -276,13 +276,6 @@ class RandoCalcV2View extends WatchUi.DataField {
         BankedTime        = 0.0f;
         PreviousBanked    = 0.0f;
         table_entry       = 0;
-
-        for( var i = 0; i < trend_data_banked.size(); i++ ) {
-            trend_data_banked[i]  = 0.0; 
-        }
-
-        trend_i           = 0;
-        trend_text        = "";
 
         // ------------------------------------------
         // Display Format/Verbosity.
@@ -407,23 +400,7 @@ class RandoCalcV2View extends WatchUi.DataField {
         // Trend Calculation for Mario Claussnitzer.
         // Save the current current banked value. 
         // If you have more banked time than you did 30s ago, its a positive trend.
-        {
-            var trend_banked  = BankedTime   - trend_data_banked[trend_i];
-
-            // System.print  ("tBanked " + trend_banked + ");
-
-            if ( trend_banked > 0 ) {
-                trend_text = "!";
-                }
-            else { 
-                trend_text = "";
-                }
-
-            trend_data_banked[trend_i]  = BankedTime;
-
-            if ( trend_i < 30 ) { trend_i++; }
-            else                { trend_i = 0; }
-        }
+        trend.update(BankedTime);
 
         return; 
     }
@@ -497,7 +474,7 @@ class RandoCalcV2View extends WatchUi.DataField {
         formatted = format_time(banked, verbose_cutoff, verbose);
         
         // Add the trend indicator.
-        formatted = formatted + trend_text;
+        formatted = formatted + trend.trend_text;
                         
         var obscurityFlags = DataField.getObscurityFlags();
 

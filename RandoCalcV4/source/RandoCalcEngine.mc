@@ -1,6 +1,8 @@
 import Toybox.Lang;
 import Toybox.WatchUi; // for Text
 
+import Toybox.Test;
+
 class RandoCalcEngine
 {
 
@@ -182,7 +184,15 @@ class RandoCalcEngine
     // -------------------------------------------------------------
 
     // These lists will be indexed by the user config settings.
-    const luts as Array = [acp_90_lut, pbp_90_lut, pbp_84_lut, pbp_80_lut, straight_90_lut , rusa_lut, lel125_lut ];
+    const luts as Array = [
+        acp_90_lut,
+        pbp_90_lut,
+        pbp_84_lut, 
+        pbp_80_lut, 
+        straight_90_lut, 
+        rusa_lut, 
+        lel125_lut 
+        ];
 
     // Displayable table names.
     const method_names = ["ACP90", "PBP90", "PBP84", "PBP80", "RM90" , "RUSA", "LEL128" ];
@@ -210,6 +220,11 @@ class RandoCalcEngine
         // ------------------------------------------
         // Choose the look-up table. 
         // ------------------------------------------
+        if (which_flavor >= method_names.size() ) {
+            which_flavor = 0; // On fail, log and recover;
+            System.println("Programmer error.  Invalid table");
+        }
+
         method_name       = method_names[which_flavor];   
 
         // Todo.  Add error checking here.  
@@ -258,7 +273,6 @@ class RandoCalcEngine
             lut[last][2] = 0.0;
             lut[last][3] = 0.0;
         }
-
     }
 
     // Run the update.  Note that elapsed minutes 
@@ -287,3 +301,35 @@ class RandoCalcEngine
     }
 
 }
+
+
+
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
+
+// Unit Testing. 
+
+(:test)
+function EngineInitNormal(logger as Logger) as Boolean {
+    var engine = new RandoCalcEngine(0);
+
+
+    logger.debug("UnitTestInitNormal.  method_name =" + engine.method_name );
+    return( engine.method_name.equals("ACP90") );
+}
+
+(:test)
+function EngineInitBad(logger as Logger) as Boolean {
+    var engine = new RandoCalcEngine(57);
+
+    logger.debug("UnitTestInitNormal.  method_name =" + engine.method_name );
+    return( engine.method_name.equals("ACP90") );
+}
+

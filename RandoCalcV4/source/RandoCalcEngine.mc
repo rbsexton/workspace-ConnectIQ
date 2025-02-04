@@ -333,7 +333,9 @@ function EngineInitBad(logger as Logger) as Boolean {
     return( engine.method_name.equals("ACP90") );
 }
 
-// Sanity Checks. 
+// -------------------------------------------------
+// Sanity Checks.   Straight time is simple.
+// -------------------------------------------------
 (:test)
 function EngineTestStr90(logger as Logger) as Boolean {
     var engine = new RandoCalcEngine(4);
@@ -359,3 +361,40 @@ function EngineTestStr90(logger as Logger) as Boolean {
 
     return( true );
 }
+
+// -------------------------------------------------
+// ACP-90 has tables/Rows.  Write a test 
+// that hits most of the interesting points.
+// -------------------------------------------------
+(:test)
+function EngineTestACP90Seq(logger as Logger) as Boolean {
+    var testname = "EngineTestACP90Seq";
+    var engine = new RandoCalcEngine(0);
+    var d = 0.0;
+    var t = 0.0; 
+
+    logger.debug( testname + ".  method_name =" + engine.method_name );
+    Test.assertMessage(engine.method_name.equals("ACP90"), "Bad Init Value");
+
+    // Start 
+    logger.debug(testname + ". In-hand at start=" + engine.BankedTime );
+    Test.assertMessage( engine.BankedTime == 0.0, "Banked Time should init as 0!");
+
+    // 100k in 5:45 ( not 6:45 )
+    d = 100.0; t = 13.5/2 - 1.0; 
+    engine.update(d * 1000.0, t * 60.0  );
+    logger.debug(testname + ". 1 H Early @100k =" + engine.BankedTime );
+    Test.assertMessage(engine.BankedTime == 60.0, "Not on schedule");
+
+    // 200k in 13:30 
+    d = 200.0; t = 13.5; 
+    engine.update(d * 1000.0, t * 60.0 );
+    logger.debug(testname + ". On-Time @200k =" + engine.BankedTime );
+    Test.assertMessage(engine.BankedTime == 0.0, "Not on schedule");
+
+
+    return( true );
+}
+
+
+

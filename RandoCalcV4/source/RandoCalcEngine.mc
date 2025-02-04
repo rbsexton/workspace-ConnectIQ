@@ -333,3 +333,29 @@ function EngineInitBad(logger as Logger) as Boolean {
     return( engine.method_name.equals("ACP90") );
 }
 
+// Sanity Checks. 
+(:test)
+function EngineTestStr90(logger as Logger) as Boolean {
+    var engine = new RandoCalcEngine(4);
+
+    logger.debug("EngineTestStr90.  method_name =" + engine.method_name );
+
+    Test.assertMessage(engine.method_name.equals("RM90"), "Bad Init Value");
+
+    // This had better return with 0 minutes in hand.
+    logger.debug("EngineTestStr90. Starting Time=" + engine.BankedTime );
+
+    Test.assertMessage( engine.BankedTime == 0.0, "Banked Time should init as 0!");
+
+    engine.update(600 * 1000.0, 45 * 60.0 );
+
+    Test.assertMessage(engine.BankedTime == 0.0, "Not on schedule");
+
+    logger.debug("EngineTestStr90. 1 H Early=" + engine.BankedTime );
+
+    engine.update(1200 * 1000.0, 89 * 60.0 );
+    Test.assertMessage(engine.BankedTime == 60.0, "Not on schedule");
+
+
+    return( true );
+}

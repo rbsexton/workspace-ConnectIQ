@@ -3,6 +3,9 @@ import Toybox.Graphics;
 import Toybox.Lang;
 import Toybox.WatchUi;
 
+import Toybox.Test;
+
+
 class RandoCalcV2View extends WatchUi.DataField {
 
     const do_simulate = 0;
@@ -44,7 +47,15 @@ class RandoCalcV2View extends WatchUi.DataField {
         // ---------------- Up to 10 Hours ----------------
         // XhYY.Z 
         if ( verbose && banked < 600.0 ) {
-            formatted = h.format("%d") + "h" +  m.format("%02.1f");  				
+            // Bizarreness.   You can't do leading zeros and fractions. C
+            // seems to behave the same way.
+            if ( m < 10.0 ) {
+                formatted = h.format("%d") + "h0" +  m.format("%2.1f");
+            }
+            else {
+                formatted = h.format("%d") + "h" +  m.format("%2.1f");  				
+            }  
+
             return(formatted);
             }
 
@@ -55,8 +66,6 @@ class RandoCalcV2View extends WatchUi.DataField {
         formatted = h.format("%d") + "h" + m.format("%02d");
         return(formatted);
     }
-
-
 
     // -------------------------------------------------------------------------
     // Main Logic 
@@ -326,4 +335,92 @@ class RandoCalcV2View extends WatchUi.DataField {
         System.print(".");
     }
     
+}
+
+// -----------------------------------------------------------------
+// -----------------------------------------------------------------
+// Unit tests for the formatter
+// -----------------------------------------------------------------
+// -----------------------------------------------------------------
+(:test)
+function FormatterTest(logger as Logger) as Boolean {
+
+    var view = new RandoCalcV2View(); 
+
+    var vc = 60.0; 
+    var verb = false;
+    var output = "";
+
+    logger.debug( "---------------------------" );
+    logger.debug( "FT Basic Tests, Non-Verbose" );
+    logger.debug( "---------------------------" );
+
+    output = view.format_time(0.0, vc, verb);
+    logger.debug( "0s : " + output );
+    Test.assert(output.equals("0s"));
+
+    output = view.format_time(0.5, vc, verb);
+    logger.debug( "30s : " + output );
+    Test.assert(output.equals("30s"));
+
+    output = view.format_time(1.5, vc, verb);
+    logger.debug( "90s: " + output );
+    Test.assert(output.equals("1m30"));
+
+    output = view.format_time(20.0, vc, verb);
+    logger.debug( "20 min: " + output );
+    Test.assert(output.equals("20m00"));
+
+    logger.debug( "---------------------------" );
+    logger.debug( "FT Cutoff Tests, Non-Verbose" );
+    logger.debug( "---------------------------" );
+
+    // Verbosity Cutoff.    For purely personal reasons 
+    // I prefer 89m00 over 1h29m 
+    vc = 90.0; 
+    output = view.format_time(80, vc, verb);
+    logger.debug( "80 min, vc 90:" + output );
+    Test.assert(output.equals("80m00"));
+
+    vc = 60.0; 
+    output = view.format_time(80.0, vc, verb);
+    logger.debug( "80 min, vc 60: " + output );
+    Test.assert(output.equals("1h20"));
+
+    logger.debug( "---------------------------" );
+    logger.debug( "Up to 10h" );
+    logger.debug( "---------------------------" );
+ 
+    output = view.format_time(185.0, vc, false);
+    logger.debug( "3h5mins verbose=false : " + output );
+    Test.assert(output.equals("3h05"));
+
+    output = view.format_time(195.0, vc, false);
+    logger.debug( "3h15mins verbose=false : " + output );
+    Test.assert(output.equals("3h15"));
+
+
+    output = view.format_time(185.0, vc, true);
+    logger.debug( "3h5mins verbose=true : " + output );
+    Test.assert(output.equals("3h05.0"));
+
+    output = view.format_time(195.2, vc, true);
+    logger.debug( "3h5mins verbose=true : " + output );
+    Test.assert(output.equals("3h15.2"));
+
+    logger.debug( "---------------------------" );
+    logger.debug( "Over 10h" );
+    logger.debug( "---------------------------" );
+
+    output = view.format_time(601.0, vc, false);
+    logger.debug( "10h01mins verbose=false : " + output );
+    Test.assert(output.equals("10h01"));
+
+
+    // Over 10 Hours
+
+
+    // function format_time(banked as Float, verbose_cutoff as Float, verbose as Boolean) as String
+    return(true);
+
 }

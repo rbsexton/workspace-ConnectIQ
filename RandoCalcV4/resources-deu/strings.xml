@@ -3,15 +3,18 @@
     <string id="AppName">RandoCalcV4</string>
     <string id="late">Verspätet</string>
 
-    <string id="label">My Value</string>
     <string id="methodTitle">Zeitlimit der Kontrollestelle</string>
+
     <string id="ACP90">ACP90</string>
     <string id="PBP90">PBP90</string>
     <string id="PBP84">PBP84</string>
     <string id="PBP80">PBP80</string>
-    <string id="Straight90">Linear90</string>
+    <string id="Straight90">RM90(konstante)</string>
     <string id="RUSA">RUSA</string>
     <string id="LEL125">LEL128</string>
+    <string id="R80">R80/ACP72</string>
+    <string id="R70">R70/ACP63</string>
+    <string id="R60">R60/ACP54</string>
 
     <string id="ui_verboseTitle">Display Format</string>
     <string id="ui_verbose_short">H:MM+</string>

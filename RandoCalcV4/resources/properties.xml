@@ -14,8 +14,12 @@
 				<listEntry value="4">@Strings.Straight90</listEntry>
 				<listEntry value="5">@Strings.RUSA</listEntry>
 				<listEntry value="6">@Strings.LEL125</listEntry>
+				<listEntry value="7">@Strings.R80</listEntry>
+				<listEntry value="8">@Strings.R70</listEntry>
+				<listEntry value="9">@Strings.R60</listEntry>
 			</settingConfig>
 		</setting>
+
 		<setting propertyKey="@Properties.ui_verbose" title="@Strings.ui_verboseTitle">
 			<settingConfig type="list">
 				<listEntry value="0">@Strings.ui_verbose_short</listEntry>

@@ -46,12 +46,12 @@ class RandoCalcEngine
     // so that the required minimum speed goes back up when you hit 1000km.
     const acp_90_lut = [
         [    0,     0 ],
-        [  200,  13.5 ], // 200k in 13.5h 
-        [  300,  20.0 ], // 100k in  7.5h
-        [  400,  27.0 ], // 100k in    7h 		
-        [  600,  40.0 ], // 200k in   13h 		
-        [ 1000,  75.0 ], // 400k in   35h		
-        [ 1200,  90.0 ], // 200k in   15h
+        [  200,  13.5 ], //  200k in 13.5h 
+        [  300,  20.0 ], //  300k in 20.0h
+        [  400,  27.0 ], //  400k in 27.0h 		
+        [  600,  40.0 ], //  600k in 40.0h 		
+        [ 1000,  75.0 ], // 1000k in 75.0h		
+        [ 1200,  90.0 ], // 1200k in 90.0h
         [    0,     0 ] // Mark the end of the list.
     ];
 
@@ -180,22 +180,62 @@ class RandoCalcEngine
         ];
 
     // -------------------------------------------------------------
+    // RM60-70-80
+    // -------------------------------------------------------------
+    const acp_90_rm80_lut = [
+        [    0,     0 ],
+        [  200,  10.8 ], //  200k in 10:48h 
+        [  300,  16.0 ], //  300k in 16:00h
+        [  400,  27.0 ], //  400k in 21:36h 		
+        [  600,  32.0 ], //  600k in 32:00h 		
+        [ 1000,  60.0 ], // 1000k in 60:00h // Added by RS.  Not official.		
+        [    0,     0 ] // Mark the end of the list.
+    ];
+
+    const acp_90_rm70_lut = [
+        [    0,      0 ],
+        [  200,  9.45 ], //  200k in  9:27h 
+        [  300, 14.00 ], //  300k in 14:00h
+        [  400, 18.90 ], //  400k in 18:54h 		
+        [  600, 28.00 ], //  600k in 28:00h 		
+        [ 1000, 52.50 ], // 1000k in 52:30h // Added by RS.  Not official.		
+        [    0,     0 ] // Mark the end of the list.
+    ];
+
+    const acp_90_rm60_lut = [
+        [    0,     0 ],
+        [  200,   8.1 ], //  200k in  8:06h 
+        [  300,  12.0 ], //  300k in 12:00h
+        [  400,  16.2 ], //  400k in 16:12h 		
+        [  600,  24.0 ], //  600k in 24:00h 		
+        [ 1000,  45.0 ], // 1000k in 45:00h // Added by RS.  Not official.		
+        [    0,     0 ] // Mark the end of the list.
+    ];
+
+
+    // -------------------------------------------------------------
     // Tables of tables.
     // -------------------------------------------------------------
 
     // These lists will be indexed by the user config settings.
     const luts as Array = [
         acp_90_lut,
-        pbp_90_lut,
-        pbp_84_lut, 
-        pbp_80_lut, 
+        pbp_90_lut, pbp_84_lut, pbp_80_lut, 
         straight_90_lut, 
         rusa_lut, 
-        lel125_lut 
+        lel125_lut,
+        acp_90_rm80_lut, acp_90_rm70_lut, acp_90_rm60_lut 
         ];
 
     // Displayable table names.
-    const method_names = ["ACP90", "PBP90", "PBP84", "PBP80", "RM90" , "RUSA", "LEL128" ];
+    const method_names = [
+        "ACP90",
+        "PBP90", "PBP84", "PBP80",
+        "RM90",
+        "RUSA",
+        "LEL128",
+        "R80", "R70", "R60"
+        ];
 
     // --------------------------------------------------------------
     // --------------------------------------------------------------

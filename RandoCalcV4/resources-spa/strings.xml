@@ -3,8 +3,8 @@
     <string id="AppName">RandoCalcV4</string>
     <string id="late">Tarde</string>
 
-    <string id="label">My Value</string>
     <string id="methodTitle">Control closing times.</string>
+
     <string id="ACP90">ACP90</string>
     <string id="PBP90">PBP90</string>
     <string id="PBP84">PBP84</string>
@@ -12,6 +12,9 @@
     <string id="Straight90">Straight90</string>
     <string id="RUSA">RUSA</string>
     <string id="LEL125">LEL128</string>
+    <string id="R80">R80/ACP72</string>
+    <string id="R70">R70/ACP63</string>
+    <string id="R60">R60/ACP54</string>
 
     <string id="ui_verboseTitle">Time Display</string>
     <string id="ui_verbose_short">H:MM+</string>

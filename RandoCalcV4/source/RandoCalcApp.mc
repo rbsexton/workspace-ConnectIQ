@@ -2,6 +2,9 @@ import Toybox.Application;
 import Toybox.Lang;
 import Toybox.WatchUi;
 
+// These two are the only globals. 
+// They're here to support re-configuration on the fly 
+// via the ConnectIQ app.
 var engine         as RandoCalcEngine;
 var verbose        as Boolean;
 

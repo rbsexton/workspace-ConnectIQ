@@ -6,13 +6,27 @@ This calculator includes tables for the following closing times:
 - RUSA Permanents.   Similar to 90 hour ACP rules, but without the 'bonus minutes' that riders get on 200k and 400k events.  Supports RUSA rules for very long permanents ( 200k/day )
 - PBP 80, 84, and 90 Hour Rules for 2023.
 - Uniform 90-Hour time, as used by SIR.
+- R80/R70/R60 rules for over-achievers.  
 
 The PBP calculators are based upon the timetables published by ACP, and require no special adjustments.
 
 You can find instructions on loading the app on the Garmin Site.  You can select the desired time rules from the Garmin Connect app on your phone or from Garmin connect on your computer.
 
+
+More detail about the app and how it works is available at the link for the source code on the app page.
+
+Warning!!!     On a long ride such as PBP,  there will be some error with regards to actual ride length.   The calculator gives you an estimate of time in hand, and this estimate will drift off as the ride goes on and your individual ride data diverges from the official route.
+
+The 2023 PBP route as published by APC is either 1219 or 1224km, depending on what files you look at.    Thats about a 20 minute difference.
+
+When in doubt, check your brevet card.  Doubly so if you're going for Société Adrian Hands
+
+If you need to email me directly, send it to kudra.com, "randocalc"  
+
+
 4.0.0.  Feb 2025 
  - Add support for R80/R70/R60 per https://cyclosmontagnards.org/R80Rules.html
+    If you ride past 600k you get ACP72/63/54
  - Add support for changing the close time rules mid-ride from the garmin app.
  - Behind the scenes: add lots of automated testing.
  - Fix a rare formatting glitch, id'd by automated testing.

@@ -1,10 +1,17 @@
 <resources>
     <string id="language">German</string>
     <string id="AppName">RandoCalcV4</string>
+
+    <!-- This is the on-screen text for  -->
+    <!-- "You are behind schedule"       -->
     <string id="late">Verspätet</string>
 
+    <!-- Connect-IQ Setting                         -->
+    <!-- Control Close Rules                        -->
     <string id="methodTitle">Zeitlimit der Kontrollestelle</string>
 
+    <!-- Connect-IQ Setting                         -->
+    <!-- These are the available control time rules -->
     <string id="ACP90">ACP90</string>
     <string id="PBP90">PBP90</string>
     <string id="PBP84">PBP84</string>
@@ -16,6 +23,9 @@
     <string id="R70">R70/ACP63</string>
     <string id="R60">R60/ACP54</string>
 
+    <!-- Connect-IQ Setting                          -->
+    <!-- The data field supports two different time  -->
+    <!-- formats. The shorter format is for watches  -->
     <string id="ui_verboseTitle">Display Format</string>
     <string id="ui_verbose_short">H:MM+</string>
     <string id="ui_verbose_long">H:MM.M+</string>

@@ -26,17 +26,21 @@ class RandoCalcView extends WatchUi.DataField {
             }
         // ---------------- Up to 60 / 90 Minutes ----------------
         // XXmSS
-        if ( verbose ) { verbose_cutoff = 90.0; }
-        else           { verbose_cutoff = 60.0; } 
-  
-        if ( banked < verbose_cutoff ) { // Minutes and seconds.
-            var m = banked.toNumber();
-            var s = ( banked - m ) * 60.0f;
-            s = s.toNumber();
-            
-            formatted = m.format("%d") + "m" + s.format("%02d");  	
-            return(formatted);
-            }
+        {
+            var verbose_cutoff;
+
+            if ( verbose ) { verbose_cutoff = 90.0; }
+            else           { verbose_cutoff = 60.0; } 
+    
+            if ( banked < verbose_cutoff ) { // Minutes and seconds.
+                var m = banked.toNumber();
+                var s = ( banked - m ) * 60.0f;
+                s = s.toNumber();
+                
+                formatted = m.format("%d") + "m" + s.format("%02d");  	
+                return(formatted);
+                }
+        }
 
         // ---------------- Beyond 60 or 90m ----------------------------
         // The Math is the same for HmMM.M and HHmMM, so do it together.

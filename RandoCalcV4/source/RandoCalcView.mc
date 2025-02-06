@@ -8,8 +8,7 @@ import Toybox.Test;
 
 class RandoCalcV2View extends WatchUi.DataField {
 
-    const do_simulate = 1;
-
+    const do_simulate = 0;
 
     // -------------------------------------------------------------
     // Support methods 

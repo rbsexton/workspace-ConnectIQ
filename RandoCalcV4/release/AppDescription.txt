@@ -23,11 +23,10 @@ When in doubt, check your brevet card.  Doubly so if you're going for Société 
 
 If you need to email me directly, send it to kudra.com, "randocalc"  
 
-
-4.0.0.  Feb 2025 
+4.0.1 Feb 2025 
  - Add support for R80/R70/R60 per https://cyclosmontagnards.org/R80Rules.html
     If you ride past 600k you get ACP72/63/54
- - Add support for changing the close time rules mid-ride from the garmin app.
+ - Add support for changing the close time rules mid-ride from the Garmin app.
  - Behind the scenes: add lots of automated testing.
  - Fix a rare formatting glitch, id'd by automated testing.
 

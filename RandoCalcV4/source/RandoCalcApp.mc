@@ -2,7 +2,7 @@ import Toybox.Application;
 import Toybox.Lang;
 import Toybox.WatchUi;
 
-class RandoCalcV2App extends Application.AppBase {
+class RandoCalcApp extends Application.AppBase {
 
     function initialize() {
         AppBase.initialize();
@@ -23,7 +23,7 @@ class RandoCalcV2App extends Application.AppBase {
 
 }
 
-function getApp() as RandoCalcV2App {
-    return Application.getApp() as RandoCalcV2App;
+function getApp() as RandoCalcApp {
+    return Application.getApp() as RandoCalcApp;
 }
 

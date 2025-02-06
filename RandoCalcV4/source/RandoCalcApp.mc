@@ -4,7 +4,6 @@ import Toybox.WatchUi;
 
 var engine         as RandoCalcEngine;
 var verbose        as Boolean;
-var verbose_cutoff as Float;
 
 class RandoCalcApp extends Application.AppBase {
 
@@ -19,8 +18,6 @@ class RandoCalcApp extends Application.AppBase {
         // Display Format/Verbosity.
         // ------------------------------------------
         verbose           = Application.Properties.getValue("ui_verbose");
-        if ( verbose ) { verbose_cutoff = 90.0; }
-        else           { verbose_cutoff = 60.0; } 
     }
 
     function initialize() {

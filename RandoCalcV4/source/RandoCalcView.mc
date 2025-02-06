@@ -12,7 +12,7 @@ class RandoCalcView extends WatchUi.DataField {
     // -------------------------------------------------------------
     // Support methods 
     // -------------------------------------------------------------
-    function format_time(banked as Float, verbose_cutoff as Float, verbose as Boolean) as String {
+    function format_time(banked as Float, verbose as Boolean) as String {
         var formatted; 
 
         // ---------------- Seconds ----------------
@@ -26,6 +26,9 @@ class RandoCalcView extends WatchUi.DataField {
             }
         // ---------------- Up to 60 / 90 Minutes ----------------
         // XXmSS
+        if ( verbose ) { verbose_cutoff = 90.0; }
+        else           { verbose_cutoff = 60.0; } 
+  
         if ( banked < verbose_cutoff ) { // Minutes and seconds.
             var m = banked.toNumber();
             var s = ( banked - m ) * 60.0f;
@@ -200,7 +203,7 @@ class RandoCalcView extends WatchUi.DataField {
             inthehole = false;
             }
 
-        formatted = format_time(banked, $.verbose_cutoff, $.verbose);
+        formatted = format_time(banked, $.verbose);
         
         // Add the trend indicator.
         formatted = formatted + trend.trend_text;
@@ -329,7 +332,6 @@ function FormatterTest(logger as Logger) as Boolean {
 
     var view = new RandoCalcView(); 
 
-    var vc = 60.0; 
     var verb = false;
     var output = "";
 
@@ -337,19 +339,19 @@ function FormatterTest(logger as Logger) as Boolean {
     logger.debug( "FT Basic Tests, Non-Verbose" );
     logger.debug( "---------------------------" );
 
-    output = view.format_time(0.0, vc, verb);
+    output = view.format_time(0.0, verb);
     logger.debug( "0s : " + output );
     Test.assert(output.equals("0s"));
 
-    output = view.format_time(0.5, vc, verb);
+    output = view.format_time(0.5, verb);
     logger.debug( "30s : " + output );
     Test.assert(output.equals("30s"));
 
-    output = view.format_time(1.5, vc, verb);
+    output = view.format_time(1.5, verb);
     logger.debug( "90s: " + output );
     Test.assert(output.equals("1m30"));
 
-    output = view.format_time(20.0, vc, verb);
+    output = view.format_time(20.0, verb);
     logger.debug( "20 min: " + output );
     Test.assert(output.equals("20m00"));
 
@@ -359,34 +361,32 @@ function FormatterTest(logger as Logger) as Boolean {
 
     // Verbosity Cutoff.    For purely personal reasons 
     // I prefer 89m00 over 1h29m 
-    vc = 90.0; 
-    output = view.format_time(80, vc, verb);
-    logger.debug( "80 min, vc 90:" + output );
+    output = view.format_time(80, true);
+    logger.debug( "80 min, verb 90:" + output );
     Test.assert(output.equals("80m00"));
 
-    vc = 60.0; 
-    output = view.format_time(80.0, vc, verb);
-    logger.debug( "80 min, vc 60: " + output );
+    output = view.format_time(80.0, false);
+    logger.debug( "80 min, !verb: " + output );
     Test.assert(output.equals("1h20"));
 
     logger.debug( "---------------------------" );
     logger.debug( "Up to 10h" );
     logger.debug( "---------------------------" );
  
-    output = view.format_time(185.0, vc, false);
+    output = view.format_time(185.0, false);
     logger.debug( "3h5mins verbose=false : " + output );
     Test.assert(output.equals("3h05"));
 
-    output = view.format_time(195.0, vc, false);
+    output = view.format_time(195.0, false);
     logger.debug( "3h15mins verbose=false : " + output );
     Test.assert(output.equals("3h15"));
 
 
-    output = view.format_time(185.0, vc, true);
+    output = view.format_time(185.0, true);
     logger.debug( "3h5mins verbose=true : " + output );
     Test.assert(output.equals("3h05.0"));
 
-    output = view.format_time(195.2, vc, true);
+    output = view.format_time(195.2, true);
     logger.debug( "3h5mins verbose=true : " + output );
     Test.assert(output.equals("3h15.2"));
 
@@ -394,7 +394,7 @@ function FormatterTest(logger as Logger) as Boolean {
     logger.debug( "Over 10h" );
     logger.debug( "---------------------------" );
 
-    output = view.format_time(601.0, vc, false);
+    output = view.format_time(601.0, false);
     logger.debug( "10h01mins verbose=false : " + output );
     Test.assert(output.equals("10h01"));
 

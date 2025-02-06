@@ -6,7 +6,7 @@ import Toybox.WatchUi;
 import Toybox.Test;
 
 
-class RandoCalcV2View extends WatchUi.DataField {
+class RandoCalcView extends WatchUi.DataField {
 
     const do_simulate = 0;
 
@@ -109,27 +109,6 @@ class RandoCalcV2View extends WatchUi.DataField {
 
             System.println("Started 0kph");
         }
-    }
-
-    function onSettingsChanged() {
-        trend = new RandoCalcTrend();
-
-        // Localization.
-        _late_message = WatchUi.loadResource($.Rez.Strings.late) as String;
-
-        // ------------------------------------------
-        // Display Format/Verbosity.
-        // ------------------------------------------
-        verbose           = Application.Properties.getValue("ui_verbose");
-        if ( verbose ) { verbose_cutoff = 90.0; }
-        else           { verbose_cutoff = 60.0; } 
-
-        // ------------------------------------------
-        // Choose the look-up table. 
-        // ------------------------------------------
-        var which_flavor      = Application.Properties.getValue("method");
-        engine = new RandoCalcEngine(which_flavor);
-       
     }
 
     // ----------------------------------------------------------------------

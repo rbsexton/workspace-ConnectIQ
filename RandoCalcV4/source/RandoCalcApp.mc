@@ -8,6 +8,10 @@ class RandoCalcApp extends Application.AppBase {
         AppBase.initialize();
     }
 
+    function onSettingsChanged() {
+        AppBase.initialize();
+    }
+
     // onStart() is called on application start up
     function onStart(state as Dictionary?) as Void {
     }
@@ -18,7 +22,7 @@ class RandoCalcApp extends Application.AppBase {
 
     //! Return the initial view of your application here
     function getInitialView() as Array<Views or InputDelegates>? {
-        return [ new RandoCalcV2View() ] as Array<Views or InputDelegates>;
+        return [ new RandoCalcView() ] as Array<Views or InputDelegates>;
     }
 
 }

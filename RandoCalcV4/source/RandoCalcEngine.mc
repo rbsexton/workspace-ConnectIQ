@@ -232,8 +232,6 @@ class RandoCalcEngine
         var base_lut      = luts[which_flavor] as Array<Array>;
         var base_lut_len  = luts[which_flavor].size();
 
-        // From the web example.
-
         lut = new [ base_lut_len ];
 
         // Initialize the sub-arrays.
@@ -280,15 +278,19 @@ class RandoCalcEngine
     public function update( distance, elapsed_mins ) {
         // Figure out which entry.
         // Simplify this to a check for the next one.
-        var i = table_entry + 1;
         
         // If the next entry is less than the distance so far
         // and the next entry isn't zero, use that one.
-        if ( lut[i][0] != 0 && distance > lut[i][0] ) {
-                table_entry = i; // Save state!
-                }
-        else { i = table_entry; }
-        
+        // Do this in a greedy way so that you can restart.
+
+        var next = table_entry + 1;
+        while( lut[next][0] != 0 && distance > lut[next][0] ) {
+            next        += 1;
+            table_entry += 1;
+        } 
+
+        var i = table_entry;
+
         // Now we've ID'd the table entry to use.
         var base_mins  = lut[i][1];
 
@@ -366,6 +368,23 @@ function EngineTestStr90(logger as Logger) as Boolean {
 // ACP-90 has tables/Rows.  Write a test 
 // that hits most of the interesting points.
 // -------------------------------------------------
+// Run it all, applying straight time.
+(:test)
+function EngineTestACP90Sweep(logger as Logger) as Boolean {
+    var testname = "EngineTestACP90Sweep";
+    var engine = new RandoCalcEngine(0);
+    var d = 0.0;
+
+    for( var t = 0; t <= 80; t += 1 ) {
+        d = t * 15.0; 
+        engine.update(d * 1000.0, t * 60.0  );
+        logger.debug(testname + ". " + t + "H @" + d + "=" + engine.BankedTime );
+
+        }
+    return( true );
+}
+
+
 (:test)
 function EngineTestACP90Seq(logger as Logger) as Boolean {
     var testname = "EngineTestACP90Seq";
@@ -392,6 +411,114 @@ function EngineTestACP90Seq(logger as Logger) as Boolean {
     logger.debug(testname + ". On-Time @200k =" + engine.BankedTime );
     Test.assertMessage(engine.BankedTime == 0.0, "Not on schedule");
 
+    // 201k in 13:42 - On time with linear interpretation.
+    d = 203.0; t = 13.7; 
+    engine.update(d * 1000.0, t * 60.0 );
+    logger.debug(testname + ". On-Time @203k =" + engine.BankedTime );
+    // Test.assertMessage(engine.BankedTime == 0.0, "Not on schedule");
+
+    // 250k in 13:42 - On time with linear interpretation.
+    d = 250.0; t = 16.66666666666667; 
+    engine.update(d * 1000.0, t * 60.0 );
+    logger.debug(testname + ". On-Time @250k =" + engine.BankedTime );
+    // Test.assertMessage(engine.BankedTime == 0.0, "Not on schedule");
+
+    // 255k in 17h 
+    d = 255.0; t = 17.0; 
+    engine.update(d * 1000.0, t * 60.0 );
+    logger.debug(testname + ". On-Time @255k =" + engine.BankedTime );
+    // Doesn't line up perfectly between 200k and 300k.
+    // Test.assertMessage(engine.BankedTime == 60.0, "Not on schedule");
+
+    // 285k in 19h 
+    d = 285.0; t = 19.0; 
+    engine.update(d * 1000.0, t * 60.0 );
+    logger.debug(testname + ". On-Time @285k =" + engine.BankedTime );
+    // Doesn't line up perfectly between 200k and 300k.
+    // Test.assertMessage(engine.BankedTime == 60.0, "Not on schedule");
+
+    // 285k in 20h 
+    d = 285.0; t = 20.0; 
+    engine.update(d * 1000.0, t * 60.0 );
+    logger.debug(testname + ". Late 1h @285k =" + engine.BankedTime );
+    // Doesn't line up perfectly between 200k and 300k.
+    // Test.assertMessage(engine.BankedTime == -60.0, "Not on schedule");
+
+    // 300k in 21h 
+    d = 300.0; t = 21.0; 
+    engine.update(d * 1000.0, t * 60.0 );
+    logger.debug(testname + ". Late 1h @300k =" + engine.BankedTime );
+    Test.assertMessage(engine.BankedTime == -60.0, "Not on schedule");
+
+    // 330k in 22h 
+    d = 330.0; t = 22.0; 
+    engine.update(d * 1000.0, t * 60.0 );
+    logger.debug(testname + ". On-Time @330k =" + engine.BankedTime );
+    // Test.assertMessage(engine.BankedTime == -60.0, "Not on schedule");
+
+
+    // 345k in 23h - Should be on time.
+    d = 345.0; t = 23.0; 
+    engine.update(d * 1000.0, t * 60.0 );
+    logger.debug(testname + ". On Time @345k =" + engine.BankedTime );
+    // Test.assertMessage(engine.BankedTime == 0.0, "Not on schedule");
+
+    // 385k in 39h - Should be on time.
+    d = 385.0; t = 26.0; 
+    engine.update(d * 1000.0, t * 60.0 );
+    logger.debug(testname + ". On Time @385k =" + engine.BankedTime );
+    // Test.assertMessage(engine.BankedTime == 0.0, "Not on schedule");
+
+
+    return( true );
+}
+
+(:test)
+function EngineTestACP90Restart(logger as Logger) as Boolean {
+    var testname = "EngineTestACP90Restart";
+    var d = 0.0;
+    var t = 0.0; 
+
+    var engine = new RandoCalcEngine(0);
+    logger.debug( testname + ".  method_name =" + engine.method_name );
+    Test.assertMessage(engine.method_name.equals("ACP90"), "Bad Init Value");
+    Test.assertMessage(engine.BankedTime == 0.0, "Init Error");
+
+
+    engine =  new RandoCalcEngine(0);
+    // 100k in 5:45 ( not 6:45 )
+    d = 100.0; t = 13.5/2 - 1.0; 
+    engine.update(d * 1000.0, t * 60.0  );
+    logger.debug(testname + ". 1 H Early @100k =" + engine.BankedTime );
+    Test.assertMessage(engine.BankedTime == 60.0, "Not on schedule");
+
+    engine =  new RandoCalcEngine(0);
+    // 200k in 13:30 
+    d = 200.0; t = 13.5; 
+    engine.update(d * 1000.0, t * 60.0  );
+    logger.debug(testname + ". On time @200k =" + engine.BankedTime );
+    Test.assertMessage(engine.BankedTime == 0.0, "Not on schedule");
+
+    engine =  new RandoCalcEngine(0);
+    // 300k in 21h 
+    d = 300.0; t = 21.0; 
+    engine.update(d * 1000.0, t * 60.0 );
+    logger.debug(testname + ". Late 1h @300k =" + engine.BankedTime );
+    Test.assertMessage(engine.BankedTime == -60.0, "Not on schedule");
+
+    engine = new RandoCalcEngine(0);
+    // 400k in 26h 
+    d = 400.0; t = 26.0; 
+    engine.update(d * 1000.0, t * 60.0 );
+    logger.debug(testname + ". Early 1h @400k =" + engine.BankedTime );
+    Test.assertMessage(engine.BankedTime == 60.0, "Not on schedule");
+
+    engine = new RandoCalcEngine(0);
+    // 600k in 41h 
+    d = 600.0; t = 41.0; 
+    engine.update(d * 1000.0, t * 60.0 );
+    logger.debug(testname + ". Late 1h @600k =" + engine.BankedTime );
+    Test.assertMessage(engine.BankedTime == -60.0, "Not on schedule");
 
     return( true );
 }

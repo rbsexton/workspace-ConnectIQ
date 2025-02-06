@@ -71,10 +71,6 @@ class RandoCalcView extends WatchUi.DataField {
     // -------------------------------------------------------------------------
     // Main Logic 
     // -------------------------------------------------------------------------
-
-    hidden var verbose         as Boolean; 
-    hidden var verbose_cutoff  as Float ;
-
     private var trend  as RandoCalcTrend; 
     private var _late_message as String;
 

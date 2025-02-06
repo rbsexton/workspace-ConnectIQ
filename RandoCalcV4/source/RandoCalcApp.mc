@@ -11,7 +11,7 @@ class RandoCalcApp extends Application.AppBase {
         // ------------------------------------------
         // Choose the look-up table. 
         // ------------------------------------------
-        var which_flavor      = Application.Properties.getValue("method");
+        var which_flavor = Application.Properties.getValue("method");
         engine = new RandoCalcEngine(which_flavor);
 
         // ------------------------------------------

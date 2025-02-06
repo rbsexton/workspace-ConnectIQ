@@ -16,13 +16,13 @@ class RandoCalcEngine
     // the first step is converting from human friendly units to something 
     // that works better for calculation. 
 
-    // These tables are copied to make the internal lookup table. 
+    // These tables are actually templates.   They're used 
+    // to create the primary tables in GPS-friendly units.
     // 
-    // That table contains:
-    // starting km for this leg 
-    // time limit for this leg. 
-    // minimum speed during this leg, in minutes/meter. 
-    // minimum speed during this leg in kph. 
+    // 0: Distance offset ( m )
+    // 1: Time ( minutes )
+    // 2: Required Speed ( minutes/meter )
+    // 3: Leg kph - Informational only.
     
     // This is an embedded device, so its better to do any complex math 
     // up front rather than in real time. 
@@ -83,7 +83,7 @@ class RandoCalcEngine
         [ 1099, 80.11667 ],
         [ 1176, 86.53333 ],
         [ 1219, 90.00000 ], 
-        [    0,        0 ] // Mark the end of the list.
+        [    0,        0 ] 
     ];
 
     // 2023 
@@ -189,7 +189,7 @@ class RandoCalcEngine
         [  400,  27.0 ], //  400k in 21:36h 		
         [  600,  32.0 ], //  600k in 32:00h 		
         [ 1000,  60.0 ], // 1000k in 60:00h // Added by RS.  Not official.		
-        [    0,     0 ] // Mark the end of the list.
+        [    0,     0 ] 
     ];
 
     const acp_90_rm70_lut = [
@@ -199,7 +199,7 @@ class RandoCalcEngine
         [  400, 18.90 ], //  400k in 18:54h 		
         [  600, 28.00 ], //  600k in 28:00h 		
         [ 1000, 52.50 ], // 1000k in 52:30h // Added by RS.  Not official.		
-        [    0,     0 ] // Mark the end of the list.
+        [    0,     0 ]
     ];
 
     const acp_90_rm60_lut = [
@@ -209,7 +209,7 @@ class RandoCalcEngine
         [  400,  16.2 ], //  400k in 16:12h 		
         [  600,  24.0 ], //  600k in 24:00h 		
         [ 1000,  45.0 ], // 1000k in 45:00h // Added by RS.  Not official.		
-        [    0,     0 ] // Mark the end of the list.
+        [    0,     0 ] 
     ];
 
 
@@ -249,7 +249,6 @@ class RandoCalcEngine
     // --------------------------------------------------------------
     // Internal State.
     // --------------------------------------------------------------
-
     protected var table_entry as Number;
     protected var lut         as Array<Array>;
 
@@ -266,8 +265,6 @@ class RandoCalcEngine
         }
 
         method_name       = method_names[which_flavor];   
-
-        // Todo.  Add error checking here.  
 
         var base_lut      = luts[which_flavor] as Array<Array>;
         var base_lut_len  = luts[which_flavor].size();
@@ -323,8 +320,9 @@ class RandoCalcEngine
         // and the next entry isn't zero, use that one.
         // Do this in a greedy way so that you can restart.
 
+        // Check for distance first, as that usually will fail.
         var next = table_entry + 1;
-        while( lut[next][0] != 0 && distance > lut[next][0] ) {
+        while( distance > lut[next][0] && lut[next][0] != 0 ) {
             next        += 1;
             table_entry += 1;
         } 
@@ -344,24 +342,21 @@ class RandoCalcEngine
 
 }
 
-
-
-    // -------------------------------------------------------------------------
-    // -------------------------------------------------------------------------
-    // -------------------------------------------------------------------------
-    // -------------------------------------------------------------------------
-    // -------------------------------------------------------------------------
-    // -------------------------------------------------------------------------
-    // -------------------------------------------------------------------------
-    // -------------------------------------------------------------------------
-    // -------------------------------------------------------------------------
+// -------------------------------------------------------------------------
+// -------------------------------------------------------------------------
+// -------------------------------------------------------------------------
+// -------------------------------------------------------------------------
+// -------------------------------------------------------------------------
+// -------------------------------------------------------------------------
+// -------------------------------------------------------------------------
+// -------------------------------------------------------------------------
+// -------------------------------------------------------------------------
 
 // Unit Testing. 
 
 (:test)
 function EngineInitNormal(logger as Logger) as Boolean {
     var engine = new RandoCalcEngine(0);
-
 
     logger.debug("UnitTestInitNormal.  method_name =" + engine.method_name );
     return( engine.method_name.equals("ACP90") );
@@ -562,6 +557,3 @@ function EngineTestACP90Restart(logger as Logger) as Boolean {
 
     return( true );
 }
-
-
-

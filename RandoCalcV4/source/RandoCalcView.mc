@@ -5,7 +5,6 @@ import Toybox.WatchUi;
 
 import Toybox.Test;
 
-
 class RandoCalcView extends WatchUi.DataField {
 
     const do_simulate = 0;
@@ -74,8 +73,6 @@ class RandoCalcView extends WatchUi.DataField {
     hidden var verbose_cutoff  as Float ;
 
     private var trend  as RandoCalcTrend; 
-    private var engine as RandoCalcEngine;
-
     private var _late_message as String;
 
     // Set the label of the data field here.
@@ -86,19 +83,6 @@ class RandoCalcView extends WatchUi.DataField {
 
         // Localization.
         _late_message = WatchUi.loadResource($.Rez.Strings.late) as String;
-
-        // ------------------------------------------
-        // Display Format/Verbosity.
-        // ------------------------------------------
-        verbose           = Application.Properties.getValue("ui_verbose");
-        if ( verbose ) { verbose_cutoff = 90.0; }
-        else           { verbose_cutoff = 60.0; } 
-
-        // ------------------------------------------
-        // Choose the look-up table. 
-        // ------------------------------------------
-        var which_flavor      = Application.Properties.getValue("method");
-        engine = new RandoCalcEngine(which_flavor);
        
         // ------------------------------------------
         // Simulation Init.
@@ -126,7 +110,7 @@ class RandoCalcView extends WatchUi.DataField {
         }
 
         if ( distance == null || info.elapsedTime == null ) {
-            engine.BankedTime = 0.0f;
+            $.engine.BankedTime = 0.0f;
             return;
             }
 
@@ -140,13 +124,13 @@ class RandoCalcView extends WatchUi.DataField {
             // System.println( "dist: " + distance + " mins: " + elapsed_mins);
         }
 
-        engine.update(distance, elapsed_mins);
+        $.engine.update(distance, elapsed_mins);
 
         // ---------------------------------------------------------------
         // Trend Calculation for Mario Claussnitzer.
         // Save the current current banked value. 
         // If you have more banked time than you did 30s ago, its a positive trend.
-        trend.update(engine.BankedTime);
+        trend.update($.engine.BankedTime);
 
         return; 
     }
@@ -204,20 +188,19 @@ class RandoCalcView extends WatchUi.DataField {
     function onUpdate(dc) {
 
         var inthehole; 
-        var banked;
+        var banked = $.engine.BankedTime;
         var formatted;
         
         // First order of business.  Positive or negative?
-        if ( engine.BankedTime < 0 ) {
+        if ( banked < 0 ) {
             inthehole = true;
-            banked = engine.BankedTime.abs();
+            banked = banked.abs();
             }
         else {
             inthehole = false;
-            banked = engine.BankedTime;
             }
 
-        formatted = format_time(banked, verbose_cutoff, verbose);
+        formatted = format_time(banked, $.verbose_cutoff, $.verbose);
         
         // Add the trend indicator.
         formatted = formatted + trend.trend_text;
@@ -344,7 +327,7 @@ class RandoCalcView extends WatchUi.DataField {
 (:test)
 function FormatterTest(logger as Logger) as Boolean {
 
-    var view = new RandoCalcV2View(); 
+    var view = new RandoCalcView(); 
 
     var vc = 60.0; 
     var verb = false;
@@ -415,11 +398,6 @@ function FormatterTest(logger as Logger) as Boolean {
     logger.debug( "10h01mins verbose=false : " + output );
     Test.assert(output.equals("10h01"));
 
-
-    // Over 10 Hours
-
-
-    // function format_time(banked as Float, verbose_cutoff as Float, verbose as Boolean) as String
     return(true);
 
 }

@@ -23,12 +23,17 @@ class RandoCalcApp extends Application.AppBase {
         verbose           = Application.Properties.getValue("ui_verbose");
     }
 
-    function initialize() {
-        AppBase.initialize();
-    }
-
     function onSettingsChanged() {
         apply_config();
+    }
+
+
+    // ----------------------------------------------
+    // Garmin-Supplied code from here down.
+    // ----------------------------------------------
+
+    function initialize() {
+        AppBase.initialize();
     }
 
     // onStart() is called on application start up

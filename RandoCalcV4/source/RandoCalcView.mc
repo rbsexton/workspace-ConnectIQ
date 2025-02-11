@@ -117,17 +117,19 @@ class RandoCalcView extends WatchUi.DataField {
             return;
             }
 
-        var elapsed_mins;
+        {
+            var elapsed_mins;
 
-        if ( do_simulate != 1 ) { 
-            elapsed_mins = (info.elapsedTime * .0000166666 );
-        }	
-        else { 
-            elapsed_mins = simulation_counter;
-            // System.println( "dist: " + distance + " mins: " + elapsed_mins);
+            if ( do_simulate != 1 ) { 
+                elapsed_mins = (info.elapsedTime * .0000166666 );
+            }	
+            else { 
+                elapsed_mins = simulation_counter;
+                // System.println( "dist: " + distance + " mins: " + elapsed_mins);
+            }
+
+            $.engine.update(distance, elapsed_mins);
         }
-
-        $.engine.update(distance, elapsed_mins);
 
         // ---------------------------------------------------------------
         // Trend Calculation for Mario Claussnitzer.

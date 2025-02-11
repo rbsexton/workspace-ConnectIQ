@@ -175,7 +175,10 @@ class RandoCalcView extends WatchUi.DataField {
             valueView.locY = valueView.locY + 7;
         }
 
-        View.findDrawableById("label").setText(engine.method_name);
+        // Sample app has this
+        // (View.findDrawableById("label") as Text).setText(Rez.Strings.label);
+        (View.findDrawableById("label") as Text).setText(engine.method_name);
+
         return;
     }
 

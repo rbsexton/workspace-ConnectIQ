@@ -5,8 +5,8 @@ import Toybox.WatchUi;
 // These two are the only globals. 
 // They're here to support re-configuration on the fly 
 // via the ConnectIQ app.
-var engine         as RandoCalcEngine;
-var verbose        as Boolean;
+var engine         as RandoCalcEngine or Null;
+var verbose        as Boolean or Null;
 
 class RandoCalcApp extends Application.AppBase {
 
@@ -40,9 +40,9 @@ class RandoCalcApp extends Application.AppBase {
     function onStop(state as Dictionary?) as Void {
     }
 
-    //! Return the initial view of your application here
-    function getInitialView() as Array<Views or InputDelegates>? {
-        return [ new RandoCalcView() ] as Array<Views or InputDelegates>;
+   //! Return the initial view of your application here
+    function getInitialView() as [Views] or [Views, InputDelegates] {
+        return [ new RandoCalcView() ];
     }
 
 }

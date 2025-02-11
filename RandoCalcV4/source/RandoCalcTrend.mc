@@ -5,18 +5,26 @@ import Toybox.Test;
 class RandoCalcTrend
 {
 
-    public var trend_text  as String;
+    public var trend_text  as String = "";
 
-    protected var trend_data_banked as Array<Float> = new[31];
-    protected var trend_i           as Number;
+    // This is a ring buffer.   
+    // trend_i always points to the oldest data item.
+    // Note: This code doesn't really need to support 
+    // re-configuration.  Any oddness that happens will 
+    // clear up in 30s or so. 
 
+    // The math looks a little odd here.  The intent is that
+    // you have 31 entries, so the last sample is 30s old.
+
+    const TREND_LEN = 31;
+
+    protected var trend_data_banked as Array<Float> = new[TREND_LEN];
+    protected var trend_i = 0;
+    
     public function initialize( ) {
-        for( var i = 0; i < trend_data_banked.size(); i++ ) {
+        for( var i = 0; i < TREND_LEN; i++ ) {
             trend_data_banked[i]  = 0.0; 
         }
-
-        trend_i = 0;
-        trend_text = "";
     }
         
     public function update( BankedTime ) {
@@ -30,17 +38,24 @@ class RandoCalcTrend
         if ( trend_banked > 0 ) { self.trend_text = "+";  } 
         else                    { self.trend_text = ""; } 
 
-        trend_data_banked[trend_i]  = BankedTime;
+        trend_data_banked[trend_i] = BankedTime;
 
-        if ( trend_i < 30 ) { trend_i++; }
+        if ( trend_i < (    TREND_LEN-1) ) { trend_i++; }
         else                { trend_i = 0; }
     }
-
-
-
-
-
 }
+
+// -------------------------------------------------------------------------
+// -------------------------------------------------------------------------
+// -------------------------------------------------------------------------
+// -------------------------------------------------------------------------
+// -------------------------------------------------------------------------
+// -------------------------------------------------------------------------
+// -------------------------------------------------------------------------
+// -------------------------------------------------------------------------
+// -------------------------------------------------------------------------
+
+// Unit Testing. 
 
 (:test)
 function UnitTestNotMoving(logger as Logger) as Boolean {

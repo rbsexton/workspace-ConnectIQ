@@ -244,7 +244,7 @@ class RandoCalcEngine
     // --------------------------------------------------------------
     // --------------------------------------------------------------
     public var BankedTime     as Float; // Final calulated value.
-    public var method_name    as Text;
+    public var method_name    as String;
 
     // --------------------------------------------------------------
     // Internal State.

@@ -252,7 +252,7 @@ class RandoCalcEngine
     protected var table_entry as Number;
     protected var lut         as Array<Array>;
 
-    public function initialize( which_flavor ) {
+    public function initialize( which_flavor as String) {
         BankedTime        = 0.0f;
         table_entry       = 0;
 
@@ -312,7 +312,7 @@ class RandoCalcEngine
 
     // Run the update.  Note that elapsed minutes 
     // is a high-level construct.
-    public function update( distance, elapsed_mins ) {
+    public function update( distance as Float, elapsed_mins as Float) as Void {
         // Figure out which entry.
         // Simplify this to a check for the next one.
         

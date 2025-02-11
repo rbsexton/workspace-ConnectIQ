@@ -19,7 +19,7 @@ class RandoCalcTrend
     const TREND_LEN = 31;
 
     protected var trend_data_banked as Array<Float> = new[TREND_LEN];
-    protected var trend_i = 0;
+    protected var trend_i as Number = 0; // Docs say 32-bit.
     
     public function initialize( ) {
         for( var i = 0; i < TREND_LEN; i++ ) {
@@ -27,7 +27,7 @@ class RandoCalcTrend
         }
     }
         
-    public function update( BankedTime ) {
+    public function update( BankedTime as Float ) as Void {
         var trend_banked  = BankedTime   - trend_data_banked[trend_i];
 
         // This is sort of a violation of UI - 
